@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 9dc0215a15c577445982a2e27b17723b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - road: {fileID: 2100000, guid: 0507e1e4370429b4bb425498fbf1a165, type: 2}
+  - overlay: {fileID: 2100000, guid: 576b30ace62aa7240bbbba9efd4d4c05, type: 2}
+  - yellow: {fileID: 2100000, guid: cbab1eb618a003747bb1d7094d164c62, type: 2}
+  - tire: {fileID: 2100000, guid: 3045ccaff8af5b945aaa81275a3b903a, type: 2}
+  - yellow_4: {fileID: 2100000, guid: ed572d8002158994083807470ac48cfe, type: 2}
+  - tire_4: {fileID: 2100000, guid: 220b946a28505f248a61fbb91e6cc99e, type: 2}
+  - yellow_6: {fileID: 2100000, guid: 8a6c9c9ae8656af4185586b3db1fa086, type: 2}
+  - tire_6: {fileID: 2100000, guid: 3eae2d48c3265264f837dc4c2d55394c, type: 2}
+  - shoulder: {fileID: 2100000, guid: 8436467218ffd39458893e7d71ef922a, type: 2}
+  - dirt_road: {fileID: 2100000, guid: e820affe0fc621d40b1e8ddd105c2787, type: 2}
+  - brick_road: {fileID: 2100000, guid: 2f56f8a9f75dc814597b398697a5624d, type: 2}
+  - cobble_road: {fileID: 2100000, guid: 4ae110091cdba9444b4abeb8ac844916, type: 2}
+  - pavement: {fileID: 13400000, guid: 6e380554238fde648adca7e1b7a76c88, type: 2}
+  - dirt: {fileID: 13400000, guid: 101c5ff9f33d031499934ada6adebe57, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

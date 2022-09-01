@@ -1,0 +1,58 @@
+fileFormatVersion: 2
+guid: b135db4f64080a94690da38eededc382
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - road: {fileID: 2100000, guid: 0507e1e4370429b4bb425498fbf1a165, type: 2}
+  - overlay: {fileID: 2100000, guid: 576b30ace62aa7240bbbba9efd4d4c05, type: 2}
+  - yellow: {fileID: 2100000, guid: cbab1eb618a003747bb1d7094d164c62, type: 2}
+  - tire: {fileID: 2100000, guid: 3045ccaff8af5b945aaa81275a3b903a, type: 2}
+  - yellow_4: {fileID: 2100000, guid: ed572d8002158994083807470ac48cfe, type: 2}
+  - tire_4: {fileID: 2100000, guid: 220b946a28505f248a61fbb91e6cc99e, type: 2}
+  - yellow_6: {fileID: 2100000, guid: 8a6c9c9ae8656af4185586b3db1fa086, type: 2}
+  - tire_6: {fileID: 2100000, guid: 3eae2d48c3265264f837dc4c2d55394c, type: 2}
+  - shoulder: {fileID: 2100000, guid: 8436467218ffd39458893e7d71ef922a, type: 2}
+  - dirt_road: {fileID: 2100000, guid: e820affe0fc621d40b1e8ddd105c2787, type: 2}
+  - brick_road: {fileID: 2100000, guid: 2f56f8a9f75dc814597b398697a5624d, type: 2}
+  - cobble_road: {fileID: 2100000, guid: 4ae110091cdba9444b4abeb8ac844916, type: 2}
+  - pavement: {fileID: 13400000, guid: 6e380554238fde648adca7e1b7a76c88, type: 2}
+  - dirt: {fileID: 13400000, guid: 101c5ff9f33d031499934ada6adebe57, type: 2}
+  - MainMeshes: {instanceID: 0}
+  - MeshRoad: {instanceID: 0}
+  - MeshShoR: {instanceID: 0}
+  - MeshShoL: {instanceID: 0}
+  - MeshiLanes: {instanceID: 0}
+  - MeshiLanes0: {instanceID: 0}
+  - MeshiLanes1: {instanceID: 0}
+  - MeshiLanes2: {instanceID: 0}
+  - MeshiLanes3: {instanceID: 0}
+  - MeshiMainPlates: {instanceID: 0}
+  - MeshiMarkerPlates: {instanceID: 0}
+  - spline: {instanceID: 0}
+  - splineObject: {instanceID: 0}
+  - roadSystem: {instanceID: 0}
+  - RoadMaterial1: {instanceID: 0}
+  - RoadMaterial2: {instanceID: 0}
+  - RoadMaterial3: {instanceID: 0}
+  - RoadMaterial4: {instanceID: 0}
+  - RoadMaterialMarker1: {instanceID: 0}
+  - RoadMaterialMarker2: {instanceID: 0}
+  - RoadMaterialMarker3: {instanceID: 0}
+  - RoadMaterialMarker4: {instanceID: 0}
+  - ShoulderMaterial1: {instanceID: 0}
+  - ShoulderMaterial2: {instanceID: 0}
+  - ShoulderMaterial3: {instanceID: 0}
+  - ShoulderMaterial4: {instanceID: 0}
+  - ShoulderMaterialMarker1: {instanceID: 0}
+  - ShoulderMaterialMarker2: {instanceID: 0}
+  - ShoulderMaterialMarker3: {instanceID: 0}
+  - ShoulderMaterialMarker4: {instanceID: 0}
+  - RoadPhysicMaterial: {instanceID: 0}
+  - ShoulderPhysicMaterial: {instanceID: 0}
+  - editorPlayCamera: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
