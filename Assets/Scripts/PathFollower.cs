@@ -59,6 +59,7 @@ public class PathFollower : MonoBehaviour
                     Vector3 linear_pos = nodes[current_node] + (nodes[next_node] - nodes[current_node]).normalized * covered_distance;
                     transform.position = Vector3.up * 2 + road.GetComponent<RoadArchitect.Road>().spline.GetSplineValue(road.GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false));
                     Quaternion last_rotation = transform.rotation;
+
                     //transform.LookAt(Vector3.up * 2 + nodes[next_node], Vector3.up);
                     int next_next_node = (next_node + 1 < nodes.Count) ? (next_node + 1) : 0;
                     Vector3 look_at = nodes[next_node] + (nodes[next_next_node] - nodes[next_node]).normalized * covered_distance;

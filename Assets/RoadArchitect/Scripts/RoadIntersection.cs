@@ -485,6 +485,7 @@ namespace RoadArchitect
         #region "Traffic light controlling"
         private void Start()
         {
+            /* UNCOMMENT TO MAKE LIGHT WORK
             lightsRR.Setup(isLeftTurnYieldOnGreen);
             lightsRL.Setup(isLeftTurnYieldOnGreen);
             lightsLL.Setup(isLeftTurnYieldOnGreen);
@@ -499,6 +500,7 @@ namespace RoadArchitect
                 //Do your custom stuff
                 //A Traffic addon could include sensor mode.
             }
+            */
         }
 
 
