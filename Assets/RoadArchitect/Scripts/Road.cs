@@ -130,7 +130,7 @@ namespace RoadArchitect
         [UnityEngine.Serialization.FormerlySerializedAs("opt_GizmosEnabled")]
         public bool isGizmosEnabled = true;
         [UnityEngine.Serialization.FormerlySerializedAs("opt_bMultithreading")]
-        public bool isUsingMultithreading = true;
+        public bool isUsingMultithreading = false;
         [UnityEngine.Serialization.FormerlySerializedAs("opt_bSaveMeshes")]
         public bool isSavingMeshes = false;
         [UnityEngine.Serialization.FormerlySerializedAs("opt_bUseMeshColliders")]
@@ -376,11 +376,11 @@ namespace RoadArchitect
                         {
                             ConstructRoad2();
                         }
-                        else if (RoadCalcsJob1 != null && RoadCalcsJob1.Update())
+                        if (RoadCalcsJob1 != null && RoadCalcsJob1.Update())
                         {
                             ConstructRoad3();
                         }
-                        else if (RoadCalcsJob2 != null && RoadCalcsJob2.Update())
+                        if (RoadCalcsJob2 != null && RoadCalcsJob2.Update())
                         {
                             ConstructRoad4();
                         }
