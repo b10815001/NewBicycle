@@ -76,7 +76,6 @@ namespace RoadArchitect
         public void UpdateAllRoads()
         {
             Road[] allRoadObjs = GetComponentsInChildren<Road>();
-            Debug.Log(allRoadObjs.Length);
             int roadCount = allRoadObjs.Length;
             SplineC[] piggys = null;
             if (roadCount > 1)

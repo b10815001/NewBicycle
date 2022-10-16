@@ -219,10 +219,16 @@ namespace RoadArchitect
                     }
                     else if (tWindowType == WindowTypeEnum.Groups)
                     {
+                        Debug.Log(objectList[i].fileName);
+                        Debug.Log(objectList[i].isDefault);
+                        Debug.Log(objectList[i].isBridge);
                         thisNode.LoadWizardObjectsFromLibrary(objectList[i].fileName, objectList[i].isDefault, objectList[i].isBridge);
                     }
                     else if (tWindowType == WindowTypeEnum.BridgeComplete)
                     {
+                        Debug.Log(objectList[i].fileName);
+                        Debug.Log(objectList[i].isDefault);
+                        Debug.Log(objectList[i].isBridge);
                         thisNode.LoadWizardObjectsFromLibrary(objectList[i].fileName, objectList[i].isDefault, objectList[i].isBridge);
                     }
                     thisNode.isQuitGUI = true;

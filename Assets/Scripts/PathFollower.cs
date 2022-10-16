@@ -12,7 +12,7 @@ public class PathFollower : MonoBehaviour
     private float speed = 0.1f;
     private Vector3 camera_height = Vector3.up * 2;
 
-    private bool procedural = true;
+    public bool procedural = false;
 
     // Start is called before the first frame update
     void Start()
@@ -33,7 +33,7 @@ public class PathFollower : MonoBehaviour
         float distance = speed;
         if (procedural)
         {
-            List<Vector3> nodes = GameObject.Find("EventSystem").GetComponent<SceneManager>().pos_list;
+            List<Vector3> nodes = GameObject.Find("EventSystem").GetComponent<SceneManager>().all_pos[0];
             while (distance > 0)
             {
                 int next_node = (current_node + 1 < nodes.Count) ? (current_node + 1) : 0;
