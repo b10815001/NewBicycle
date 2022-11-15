@@ -14,6 +14,7 @@ public class bgBuilding : bgComponent
     public override GameObject build()
     {
         //height = 0.0f;
+        center = new Vector3(0, 0, 0);
         random_background = Random.Range(0, 15);
         go = new GameObject("Building:" + name);
         for (int i = 0; i < commands.Count; i++) {

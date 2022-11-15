@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
+[ExecuteInEditMode]
 public class bgTest : MonoBehaviour
 {
     public string component_name;
@@ -95,3 +99,19 @@ public class bgTest : MonoBehaviour
         //reBuild();
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(bgTest))]
+class bgTestEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+        bgTest test = (bgTest)target;
+        if (GUILayout.Button("Build"))
+        {
+            test.reBuild();
+        }
+    }
+}
+#endif
