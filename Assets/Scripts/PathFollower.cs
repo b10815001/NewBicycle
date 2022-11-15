@@ -17,7 +17,10 @@ public class PathFollower : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (road == null) road = GameObject.Find("Road1");
+        if (road == null)
+        {
+            road = GameObject.Find("Road1");
+        }
         //transform.position = camera_height + road.GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
         //transform.LookAt(camera_height + road.GetComponent<RoadArchitect.Road>().spline.nodes[current_node + 1].transform.position, Vector3.up);
     }

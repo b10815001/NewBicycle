@@ -1961,5 +1961,10 @@ namespace RoadArchitect
                 }
             }
         }
+
+        public Vector3 getPos(int control_id, float segment)
+        {
+            return spline.GetSplineValue(spline.GetClosestParam(spline.nodes[control_id].pos + (spline.nodes[control_id + 1].pos - spline.nodes[control_id].pos) * segment, false, false));
+        }
     }
 }
