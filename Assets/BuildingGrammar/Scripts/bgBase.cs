@@ -26,8 +26,12 @@ public class bgBase : bgComponent
         //    go.name = "Base: " + name;
         //    return go;
         //}
-       
-        go = new GameObject("Base:" + name);
+        if (go == null)
+        {
+            go = new GameObject();
+        }
+
+        go.name = "Base:" + name;
         //return go;
 
         if (component_parameter.Count > 0)
@@ -198,7 +202,9 @@ public class bgBase : bgComponent
             roof_obj.transform.localPosition = new Vector3(0, height, 0);
         }
 
-        return go;
+        GameObject result = go;
+        go = null;
+        return result;
     }
 
     bool determine_clock_wise(List<Vector3> points) { //§PÂ_¶¶®É°wOR°f®É°w

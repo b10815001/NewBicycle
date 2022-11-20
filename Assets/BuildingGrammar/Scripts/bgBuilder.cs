@@ -53,10 +53,11 @@ public class bgBuilder
         }
     }
 
-    public GameObject build(string name) {
+    public GameObject build(string name,GameObject targetGameObject = null) {
         //Debug.Log("-----------------build------------");
         for (int i = 0; i < components.Count; i++) {
             if (components[i].name == name) {
+                components[i].go = targetGameObject;
                 return components[i].build();
             }
         }

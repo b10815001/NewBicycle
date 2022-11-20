@@ -22,17 +22,25 @@ public class bgStartCreator : MonoBehaviour
         builder.compile_code(grammarFilePathArray);
         for(int i=0;i< buildingTransformList.Count;i++)
         {
-            GameObject building = builder.build(buildingComponentNameList[i]);
-            if (building == null) continue;
-            if (buildingTransformList[i] != null)
+            GameObject building = null;
+            if (createUnderSourceTransform)
             {
-                building.transform.position = buildingTransformList[i].position;
-                building.transform.rotation = buildingTransformList[i].rotation;
-                building.transform.localScale = buildingTransformList[i].localScale;
+                building = builder.build(buildingComponentNameList[i], buildingTransformList[i].gameObject);
             }
-            if (commonParent != null)
-            {
-                building.transform.parent = commonParent.transform;
+            else
+            { 
+                building = builder.build(buildingComponentNameList[i]);
+                if (building == null) continue;
+                if (buildingTransformList[i] != null)
+                {
+                    building.transform.position = buildingTransformList[i].position;
+                    building.transform.rotation = buildingTransformList[i].rotation;
+                    building.transform.localScale = buildingTransformList[i].localScale;
+                }
+                if (commonParent != null)
+                {
+                    building.transform.parent = commonParent.transform;
+                }
             }
         }
     }
@@ -92,8 +100,11 @@ public class bgStartCreatorEditor : Editor
         serializedObject.Update();
         bgStartCreator creator = (bgStartCreator)target;
         EditorGUILayout.PropertyField(serializedObject.FindProperty("grammarFilePathArray"), new GUIContent("Grammar File Path Array"));
-        //creator.createUnderSourceTransform = EditorGUILayout.Toggle("Create Under Source Transform",creator.createUnderSourceTransform);
-        creator.commonParent = (GameObject)EditorGUILayout.ObjectField(creator.commonParent, typeof(GameObject), true);
+        creator.createUnderSourceTransform = EditorGUILayout.ToggleLeft("Create Under Source Transform", creator.createUnderSourceTransform);
+        if (creator.createUnderSourceTransform == false)
+        {
+            creator.commonParent = (GameObject)EditorGUILayout.ObjectField("Common Parent GameObject", creator.commonParent, typeof(GameObject), true);
+        }
         foldOut = EditorGUILayout.Foldout(foldOut, "Building List");
         if (foldOut)
         {
@@ -116,7 +127,6 @@ public class bgStartCreatorEditor : Editor
             EditorGUILayout.EndVertical();
         }
         serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(creator);
     }
 }
 #endif

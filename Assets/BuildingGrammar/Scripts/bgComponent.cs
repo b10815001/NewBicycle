@@ -23,7 +23,7 @@ public class bgComponent
     public Vector3 center = new Vector3(0,0,0);
     public Quaternion rotate;
 
-    public GameObject go;
+    public GameObject go = null;
 
     public bgBuilder builder;
 

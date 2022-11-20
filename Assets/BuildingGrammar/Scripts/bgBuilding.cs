@@ -16,7 +16,11 @@ public class bgBuilding : bgComponent
         //height = 0.0f;
         center = new Vector3(0, 0, 0);
         random_background = Random.Range(0, 15);
-        go = new GameObject("Building:" + name);
+        if(go == null)
+        {
+            go = new GameObject();
+        }
+        go.name = "Building:" + name;
         for (int i = 0; i < commands.Count; i++) {
             if (commands[i] == "center")
             {
@@ -34,6 +38,8 @@ public class bgBuilding : bgComponent
                 center.y += _base.height;
             }
         }
-        return go;
+        GameObject result = go;
+        go = null;
+        return result;
     }
 }

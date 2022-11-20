@@ -280,7 +280,7 @@ arcade_front_facade():Facade(){
 	empty(vertical,const,4)
 	balcony_wall()
 	hello_wall()
-	arcade_4_floor()
+	balcony_wall()
 }
 
 first_floor_empty():Facade(){
@@ -290,7 +290,7 @@ first_floor_empty():Facade(){
 	nothing_wall()
 }
 
-arcade_back():Base(){
+arcade_back():Base(null,test_roof){
 	vertex(-3,0,8)
 	real_nothing()
 	vertex(3,0,8)
