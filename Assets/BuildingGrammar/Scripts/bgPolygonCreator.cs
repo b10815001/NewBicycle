@@ -10,31 +10,41 @@ using UnityEditor;
 
 [ExecuteInEditMode]
 [RequireComponent (typeof (PolygonCollider2D))]
-[RequireComponent (typeof (MeshRenderer))]
-[RequireComponent (typeof (MeshFilter))]
 /// <summary>
 /// Builds a Mesh for a gameObject using the PolygonCollider2D's path</summary>
 public class bgPolygonCreator : MonoBehaviour {
 	public string savePath = "Assets";
 	public string saveFileName = "polygon";
+	public bool editing = false;
+	public Vector2[] backupPolygon;
+	public Vector2[] editingPolygon;
+	public float polygonCoordTranslateX = 0.0f;
+	public float polygonCoordTranslateY = 0.0f;
+	public float polygonCoordScale = 1.0f;
+	public float polygonCoordRotate = 0.0f;
 	protected PolygonCollider2D polygon;
-	protected MeshFilter meshFilter;
 
 	///<summary>The index of the polygon path to use for the mesh</summary>
 	int pathIndex = 0;
 	///<summary>The Z position for the generated mesh</summary>
 	public float height = 0f;
 	#if UNITY_EDITOR
-	void Start() {
-		polygon = gameObject.GetComponent<PolygonCollider2D>();
-		meshFilter = gameObject.GetComponent<MeshFilter>();
-	} 
+	void Start() 
+	{
+		polygon = GetComponent<PolygonCollider2D>();
+	}
 
-	
+    private void OnEnable()
+    {
+		polygon = GetComponent<PolygonCollider2D>();
+	}
+
+
 	///<summary>
 	///(Re)builds the Mesh using the path of the PolygonCollider2D</summary>
 	public void OnColliderUpdate() {
 		Vector2[] path = polygon.GetPath(pathIndex);
+
 		//Mesh msh = new Mesh();
 
 		//msh.vertices = path.Select(v => new Vector3(v.x, v.y, zPosition)).ToArray();
@@ -77,7 +87,62 @@ public class bgPolygonCreator : MonoBehaviour {
 		AssetDatabase.SaveAssets();
 		AssetDatabase.Refresh();
 	}
-	#endif
+
+	public void StartEditing()
+	{
+		Vector2[] path = polygon.GetPath(pathIndex);
+
+		backupPolygon = new Vector2[path.Length];
+		editingPolygon = new Vector2[path.Length];
+		for (int i = 0; i < path.Length; i++)
+		{
+			backupPolygon[i] = path[i];
+			editingPolygon[i] = path[i];
+		}
+		polygon.SetPath(pathIndex, editingPolygon);
+
+		editing = true;
+	}
+
+	public void PolygonEditing()
+	{
+		Vector2[] path = backupPolygon;
+		for (int i = 0; i < path.Length; i++)
+		{
+
+			//scale
+			editingPolygon[i] = path[i] * polygonCoordScale;
+			//rotate
+			float sin_t = Mathf.Sin(polygonCoordRotate * Mathf.Deg2Rad);
+			float cos_t = Mathf.Cos(polygonCoordRotate * Mathf.Deg2Rad);
+			float rotateX = editingPolygon[i].y * sin_t + editingPolygon[i].x * cos_t;
+			float rotateY = editingPolygon[i].y * cos_t - editingPolygon[i].x * sin_t;
+			editingPolygon[i] = new Vector2(rotateX, rotateY);
+
+			//translate
+			editingPolygon[i] = new Vector2(editingPolygon[i].x + polygonCoordTranslateX, editingPolygon[i].y + polygonCoordTranslateY);
+		}
+
+		polygon.SetPath(pathIndex, editingPolygon);
+	}
+
+	public void ApplyEditing()
+	{
+		polygonCoordScale = 1.0f;
+		polygonCoordRotate = 0.0f;
+		editing = false;
+	}
+
+	public void UndoEditing()
+	{
+		polygonCoordTranslateX = 0.0f;
+		polygonCoordTranslateY = 0.0f;
+		polygonCoordScale = 1.0f;
+		polygonCoordRotate = 0.0f;
+		editing = false;
+		polygon.SetPath(pathIndex, backupPolygon);
+	}
+#endif
 }
 
 #if UNITY_EDITOR
@@ -88,6 +153,34 @@ public class bgPolygonCreatorEditor : Editor
 	{
 		serializedObject.Update();
 		bgPolygonCreator polygonCreator = (bgPolygonCreator)target;
+		if (polygonCreator.editing == false)
+		{
+			if (GUILayout.Button("Start Editing"))
+			{
+				polygonCreator.StartEditing();
+			}
+		}
+		else
+		{
+			polygonCreator.polygonCoordTranslateX = EditorGUILayout.Slider("Translate X", polygonCreator.polygonCoordTranslateX, -5.0f, 5.0f);
+			polygonCreator.polygonCoordTranslateY = EditorGUILayout.Slider("Translate Y", polygonCreator.polygonCoordTranslateY, -5.0f, 5.0f);
+			polygonCreator.polygonCoordScale = EditorGUILayout.Slider("Polygon Scale", polygonCreator.polygonCoordScale, 0.001f, 5.0f);
+			polygonCreator.polygonCoordRotate = EditorGUILayout.Slider("Polygon Rotate", polygonCreator.polygonCoordRotate, -180.0f, 180.0f);
+			polygonCreator.PolygonEditing();
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button("Apply"))
+			{
+				polygonCreator.ApplyEditing();
+			}
+			if (GUILayout.Button("Undo"))
+			{
+				polygonCreator.UndoEditing();
+			}
+			EditorGUILayout.EndHorizontal();
+		}
+		EditorGUILayout.Space();
+		EditorGUILayout.Space();
+		EditorGUILayout.Space();
 		EditorGUILayout.BeginHorizontal();
 		polygonCreator.savePath = EditorGUILayout.TextField(polygonCreator.savePath);
 		if (GUILayout.Button("Browse Path"))
@@ -113,7 +206,7 @@ public class bgPolygonCreatorEditor : Editor
 		}
 		EditorGUILayout.EndHorizontal();
 		polygonCreator.saveFileName = EditorGUILayout.TextField("File Name:",polygonCreator.saveFileName);
-		if (GUILayout.Button("Save Poygon Asset"))
+		if (GUILayout.Button("Save Polygon Asset"))
 		{
 			polygonCreator.SavePolygonAsset();
 		}

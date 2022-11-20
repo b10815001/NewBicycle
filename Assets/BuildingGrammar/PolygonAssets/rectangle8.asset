@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c463c27d1d3e0854b975d381a2334c55, type: 3}
+  m_Name: rectangle8
+  m_EditorClassIdentifier: 
+  points:
+  - {x: 1.2996216, y: 0, z: 0.74612236}
+  - {x: 3.4918213, y: 0, z: 0.700922}
+  - {x: 3.4978638, y: 0, z: 2.0741415}
+  - {x: 1.2125244, y: 0, z: 2.0748682}
