@@ -54,28 +54,28 @@ public class BuildingConstraint : MonoBehaviour
         for (int point_index = 0; point_index < points.Length; point_index++)
         {
             Vector3 polygon_pos = new Vector3(points[point_index].x * bg_start_creator.polygonCoordScale, 0, points[point_index].z * bg_start_creator.polygonCoordScale) + bias;
-            var terrain_data_pos = getTerrainDataPos(polygon_pos);
-            terrain_data_poss[point_index] = new Vector2(terrain_data_pos.x_base, terrain_data_pos.y_base);
-            if (terrain_data_pos.x_base < x_base)
+            var terrain_data_pos = Utils.getTerrainDataPos(terrain, polygon_pos);
+            terrain_data_poss[point_index] = new Vector2(terrain_data_pos.x, terrain_data_pos.y);
+            if (terrain_data_pos.x < x_base)
             {
-                x_base = terrain_data_pos.x_base;
+                x_base = terrain_data_pos.x;
             }
-            if (terrain_data_pos.x_base > x_boundary)
+            if (terrain_data_pos.x > x_boundary)
             {
-                x_boundary = terrain_data_pos.x_base;
+                x_boundary = terrain_data_pos.x;
             }
-            if (terrain_data_pos.y_base < y_base)
+            if (terrain_data_pos.y < y_base)
             {
-                y_base = terrain_data_pos.y_base;
+                y_base = terrain_data_pos.y;
             }
-            if (terrain_data_pos.y_base > y_boundary)
+            if (terrain_data_pos.y > y_boundary)
             {
-                y_boundary = terrain_data_pos.y_base;
+                y_boundary = terrain_data_pos.y;
             }
             if (debug)
             {
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.name = $"{terrain_data_pos.x_base} {terrain_data_pos.y_base}";
+                cube.name = $"{terrain_data_pos.x} {terrain_data_pos.y}";
                 cube.transform.position = polygon_pos;
             }
         }
@@ -105,22 +105,5 @@ public class BuildingConstraint : MonoBehaviour
             }
         }
         terrain.terrainData.SetHeights(x_base, y_base, constraint_kernel);
-    }
-
-    (int x_base, int y_base) getTerrainDataPos(Vector3 world_pos)
-    {
-        var terrain_position = terrain.transform.position;
-        TerrainData terrainData = terrain.terrainData;
-        var terrain_size = terrainData.size;
-        float relative_hitTerX = (world_pos.x - terrain_position.x) / terrain_size.x;
-        float relative_hitTerZ = (world_pos.z - terrain_position.z) / terrain_size.z;
-
-        float relativeTerCoordX = terrainData.heightmapResolution * relative_hitTerX;
-        float relativeTerCoordZ = terrainData.heightmapResolution * relative_hitTerZ;
-
-        int hitPointTerX = Mathf.RoundToInt(relativeTerCoordX);
-        int hitPointTerZ = Mathf.RoundToInt(relativeTerCoordZ);
-
-        return (hitPointTerX, hitPointTerZ);
     }
 }

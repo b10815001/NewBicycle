@@ -9,28 +9,16 @@ using System;
 using UnityEditor.PackageManager.Requests;
 using System.IO;
 
-public class DataSender : MonoBehaviour
+public class DataSender
 {
     string token = "";
-    // Start is called before the first frame update
-    void Start()
+
+    public void authorized(string auth_url, string user_info)
     {
-        string user_info = "{\n\"account\":\"Demo2\",\n\"password\":\"1111\"\n}\n";
-        string auth_url = "http://140.121.197.90:8081/auth/";
         token = "Bearer " + sendTransmit(auth_url, user_info);
-        string bicycle_data = $"{{\n\"power\":{20},\n\"rotateSpeed\":{25},\n\"speed\":{15}\n}}";
-        Debug.Log("bicycle_data: " + bicycle_data);
-        string cycle_data_url = "http://140.121.197.90:8081/cycleInfo/createCycleData/";
-        Debug.Log(sendTransmit(cycle_data_url, bicycle_data, token));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private string sendTransmit(string url, string json_text, string token = "")
+    public string sendTransmit(string url, string json_text)
     {
         string content = "";
         try

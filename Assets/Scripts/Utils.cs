@@ -7,6 +7,23 @@ using UnityEngine;
 
 public static class Utils
 {
+    public static (int x, int y) getTerrainDataPos(Terrain terrain, Vector3 world_pos)
+    {
+        var terrain_position = terrain.transform.position;
+        TerrainData terrainData = terrain.terrainData;
+        var terrain_size = terrainData.size;
+        float relative_hitTerX = (world_pos.x - terrain_position.x) / terrain_size.x;
+        float relative_hitTerZ = (world_pos.z - terrain_position.z) / terrain_size.z;
+
+        float relativeTerCoordX = terrainData.heightmapResolution * relative_hitTerX;
+        float relativeTerCoordZ = terrainData.heightmapResolution * relative_hitTerZ;
+
+        int hitPointTerX = Mathf.RoundToInt(relativeTerCoordX);
+        int hitPointTerZ = Mathf.RoundToInt(relativeTerCoordZ);
+
+        return (hitPointTerX, hitPointTerZ);
+    }
+
     //***********************************************************************
     //
     // * Returns which side of the edge the line (x,y) is on. The return value
