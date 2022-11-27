@@ -50,12 +50,12 @@ public class BuildingConstraint : MonoBehaviour
         int y_base = int.MaxValue;
         int x_boundary = int.MinValue;
         int y_boundary = int.MinValue;
-        Vector2[] terrain_data_poss = new Vector2[points.Length + 1];
+        Vector2[] building_polygon = new Vector2[points.Length];
         for (int point_index = 0; point_index < points.Length; point_index++)
         {
             Vector3 polygon_pos = new Vector3(points[point_index].x * bg_start_creator.polygonCoordScale, 0, points[point_index].z * bg_start_creator.polygonCoordScale) + bias;
             var terrain_data_pos = Utils.getTerrainDataPos(terrain, polygon_pos);
-            terrain_data_poss[point_index] = new Vector2(terrain_data_pos.x, terrain_data_pos.y);
+            building_polygon[point_index] = new Vector2(terrain_data_pos.x, terrain_data_pos.y);
             if (terrain_data_pos.x < x_base)
             {
                 x_base = terrain_data_pos.x;
@@ -79,7 +79,6 @@ public class BuildingConstraint : MonoBehaviour
                 cube.transform.position = polygon_pos;
             }
         }
-        terrain_data_poss[points.Length] = terrain_data_poss[0];
 
         int height_x_size = x_boundary - x_base + 1;
         int height_y_size = y_boundary - y_base + 1;
@@ -88,9 +87,9 @@ public class BuildingConstraint : MonoBehaviour
         // display points of the polygon
         if (debug)
         {
-            for (int point_index = 0; point_index < terrain_data_poss.Length - 1; point_index++)
+            for (int point_index = 0; point_index < building_polygon.Length - 1; point_index++)
             {
-                constraint_kernel[Mathf.RoundToInt(terrain_data_poss[point_index].y - y_base), Mathf.RoundToInt(terrain_data_poss[point_index].x - x_base)] = bias.y / 294.9983f;
+                constraint_kernel[Mathf.RoundToInt(building_polygon[point_index].y - y_base), Mathf.RoundToInt(building_polygon[point_index].x - x_base)] = bias.y / 294.9983f;
             }
         }
 
@@ -98,7 +97,7 @@ public class BuildingConstraint : MonoBehaviour
         {
             for (int j = 0; j < height_y_size; j++)
             {
-                if (Utils.isPointInPolygon(terrain_data_poss, new Vector2(x_base + i, y_base + j)))
+                if (Utils.isPointInPolygon(building_polygon, new Vector2(x_base + i, y_base + j)))
                 {
                     constraint_kernel[j, i] = bias.y / 294.9983f;
                 }

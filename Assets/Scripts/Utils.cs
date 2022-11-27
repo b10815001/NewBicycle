@@ -100,4 +100,26 @@ public static class Utils
         //}
         return result;
     }
+
+    static public bool pointInPolygon(Vector2[] polygon, Vector2 p)
+    {
+
+        int i, j = polygon.Length - 1;
+        bool oddNodes = false;
+
+        for (i = 0; i < polygon.Length; i++)
+        {
+            if (polygon[i].y < p.y && polygon[j].y >= p.y
+            || polygon[j].y < p.y && polygon[i].y >= p.y)
+            {
+                if (polygon[i].x + (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) * (polygon[j].x - polygon[i].x) < p.x)
+                {
+                    oddNodes = !oddNodes;
+                }
+            }
+            j = i;
+        }
+
+        return oddNodes;
+    }
 }

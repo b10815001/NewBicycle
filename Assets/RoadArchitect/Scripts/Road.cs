@@ -1962,9 +1962,9 @@ namespace RoadArchitect
             }
         }
 
-        public Vector3 getPos(int control_id, float segment)
+        public void getPosAndTangent(int control_id, float segment, out Vector3 pos, out Vector3 tangent)
         {
-            return spline.GetSplineValue(spline.GetClosestParam(spline.nodes[control_id].pos + (spline.nodes[control_id + 1].pos - spline.nodes[control_id].pos) * segment, false, false));
+            spline.GetSplineValueBoth(spline.GetClosestParam(spline.nodes[control_id].pos + (spline.nodes[control_id + 1].pos - spline.nodes[control_id].pos) * segment, false, false), out pos, out tangent);
         }
     }
 }
