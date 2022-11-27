@@ -16,10 +16,14 @@ public class importTerrain : MonoBehaviour
     Material terrian_mat;
     [SerializeField]
     TerrainLayer grass;
+    [SerializeField]
+    GameObject broadleaf_prefab;
+    [SerializeField]
+    GameObject conifer_prefab;
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -41,6 +45,21 @@ public class importTerrain : MonoBehaviour
                 string[] pos_string = sr.ReadLine().Split(' ');
                 string[] size_string = sr.ReadLine().Split(' ');
                 int resolution = int.Parse(sr.ReadLine().Split(' ')[1]);
+                int tree_instance_count = int.Parse(sr.ReadLine().Split(' ')[1]);
+                int[] tree_instance_index = new int[tree_instance_count];
+                Vector3[] tree_instance_pos = new Vector3[tree_instance_count];
+                float[] tree_instance_width = new float[tree_instance_count];
+                float[] tree_instance_height = new float[tree_instance_count];
+                float[] tree_instance_rotation = new float[tree_instance_count];
+                for (int tree_index = 0; tree_index < tree_instance_count; tree_index++)
+                {
+                    string[] tree_string = sr.ReadLine().Split(' ');
+                    tree_instance_pos[tree_index] = new Vector3(float.Parse(tree_string[3]), float.Parse(tree_string[4]), float.Parse(tree_string[5]));
+                    tree_instance_index[tree_index] = int.Parse(tree_string[1]);
+                    tree_instance_width[tree_index] = float.Parse(tree_string[7]);
+                    tree_instance_height[tree_index] = float.Parse(tree_string[8]);
+                    tree_instance_rotation[tree_index] = float.Parse(tree_string[10]);
+                }
 
                 terrain_object = new GameObject("terrain");
                 terrain_object.transform.position = new Vector3(float.Parse(pos_string[1]), float.Parse(pos_string[2]), float.Parse(pos_string[3]));
@@ -54,9 +73,17 @@ public class importTerrain : MonoBehaviour
                 terrain.materialTemplate = terrian_mat;
                 terrain_collider = terrain_object.AddComponent<TerrainCollider>();
                 terrain_collider.terrainData = terrain.terrainData;
+
+                terrain.terrainData.terrainLayers = new TerrainLayer[1] { grass };
+
+                TreePrototype broadleaf = new TreePrototype();
+                broadleaf.prefab = broadleaf_prefab;
+                TreePrototype conifer = new TreePrototype();
+                conifer.prefab = conifer_prefab;
+                terrain.terrainData.treePrototypes = new TreePrototype[2] { broadleaf, conifer };
+                loadTerrainTreeInstances(terrain.terrainData, tree_instance_index, tree_instance_pos, tree_instance_width, tree_instance_height, tree_instance_rotation);
             }
 
-            terrain.terrainData.terrainLayers = new TerrainLayer[1] { grass };
             var asset_path = EditorUtility.SaveFilePanel(
                 "Save terrain data asset",
                 "",
@@ -86,5 +113,20 @@ public class importTerrain : MonoBehaviour
             }
         }
         terrain_data.SetHeights(0, 0, data);
+    }
+
+    void loadTerrainTreeInstances(TerrainData terrain_data, int[] index, Vector3[] pos, float[] width, float[] height, float[] rotation)
+    {
+        TreeInstance[] tree_instances = new TreeInstance[pos.Length];
+        for (int tree_index = 0; tree_index < tree_instances.Length; tree_index++)
+        {
+            tree_instances[tree_index] = new TreeInstance();
+            tree_instances[tree_index].position = pos[tree_index];
+            tree_instances[tree_index].prototypeIndex = index[tree_index];
+            tree_instances[tree_index].widthScale = width[tree_index];
+            tree_instances[tree_index].heightScale = height[tree_index];
+            tree_instances[tree_index].rotation = rotation[tree_index];
+            terrain_data.SetTreeInstances(tree_instances, false);
+        }
     }
 }

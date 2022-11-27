@@ -43,6 +43,12 @@ public class exportBicycleTerrain : MonoBehaviour
                     sw.WriteLine($"pos: {terrain_gameobject.transform.position.x} {terrain_gameobject.transform.position.y} {terrain_gameobject.transform.position.z}");
                     sw.WriteLine($"size: {terrain.terrainData.size.x} {terrain.terrainData.size.y} {terrain.terrainData.size.z}");
                     sw.WriteLine($"heightmapResolution: {terrain.terrainData.heightmapResolution}");
+
+                    sw.WriteLine($"treeInstanceCount: {terrain.terrainData.treeInstanceCount}");
+                    for (int tree_index = 0; tree_index < terrain.terrainData.treeInstanceCount; tree_index++)
+                    {
+                        sw.WriteLine($"index: {terrain.terrainData.treeInstances[tree_index].prototypeIndex} pos: {terrain.terrainData.treeInstances[tree_index].position.x} {terrain.terrainData.treeInstances[tree_index].position.y} {terrain.terrainData.treeInstances[tree_index].position.z} scale: {terrain.terrainData.treeInstances[tree_index].widthScale} {terrain.terrainData.treeInstances[tree_index].heightScale} rotation: {terrain.terrainData.treeInstances[tree_index].rotation}");
+                    }
                 }
             }
             else
