@@ -20,6 +20,8 @@ public class PathFollower2 : MonoBehaviour
     public bool procedural = false;
     private bool pause = true;
 
+    public IndoorBike_FTMS_Connector connector;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +38,7 @@ public class PathFollower2 : MonoBehaviour
 
     private void arclength()
     {
-        float distance = speed;
+        float distance = speed * connector.GetSpeed();
         List<RoadArchitect.SplineN> nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
         int next_node = 0;
 
@@ -121,7 +123,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node + 1 < nodes.Count) ? (next_node + 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed);
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed * connector.GetSpeed());
                     }
                 }
                 else
@@ -157,7 +159,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node - 1 > 0) ? (next_node - 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed);
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed * connector.GetSpeed());
                     }
                 }
             }
