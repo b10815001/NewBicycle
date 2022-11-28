@@ -23,8 +23,8 @@ public class PathFollower2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //transform.position = camera_height + road.GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
-        //transform.LookAt(camera_height + road.GetComponent<RoadArchitect.Road>().spline.nodes[current_node + 1].transform.position, Vector3.up);
+        transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
+        transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node + 1].transform.position, Vector3.up);
     }
 
     // Update is called once per frame
@@ -121,7 +121,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node + 1 < nodes.Count) ? (next_node + 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.02f * speed);
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed);
                     }
                 }
                 else
@@ -157,7 +157,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node - 1 > 0) ? (next_node - 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.02f * speed);
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed);
                     }
                 }
             }
