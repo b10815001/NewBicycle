@@ -21,7 +21,7 @@ public class BicycleDataSender
     static float total_speed;
 
     static int times;
-    static bool debug = false;
+    static bool debug = true;
 
     static public void initial()
     {
