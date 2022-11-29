@@ -19,6 +19,7 @@ public class PathFollower2 : MonoBehaviour
 
     public bool procedural = false;
     private bool pause = true;
+    public bool ended = false;
 
     public IndoorBike_FTMS_Connector connector;
 
@@ -103,6 +104,7 @@ public class PathFollower2 : MonoBehaviour
                         if (next_node == end[current_road])
                         {
                             current_road = (current_road + 1) % roads.Count;
+                            if (current_road == 0) ended = true;
                             current_node = start[current_road];
                             nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
                         }
@@ -139,6 +141,7 @@ public class PathFollower2 : MonoBehaviour
                         if (next_node == end[current_road])
                         {
                             current_road = (current_road + 1) % roads.Count;
+                            if (current_road == 0) ended = true;
                             current_node = start[current_road];
                             nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
                         }
