@@ -6,13 +6,15 @@ using UnityEngine;
 public class IndoorBike_FTMS
 {
     public bool want_connect = true;
-    Dictionary<string, Dictionary<string, string>> devices = new Dictionary<string, Dictionary<string, string>>();
+    public Dictionary<string, Dictionary<string, string>> devices = new Dictionary<string, Dictionary<string, string>>();
     string selectedDeviceId = "";
     string selectedServiceId = "";
     string selectedCharacteristicId = "";
 
     public bool connected = false;
     public bool isSubscribed = false;
+    public bool isScanning = false;
+    public bool isConnecting = false;
 
     public string output;
     public float speed = 1.0f; public bool has_speed = false;
@@ -37,28 +39,69 @@ public class IndoorBike_FTMS
     }
 
     // Start is called before the first frame update
-    public IEnumerator connect()
+    public IEnumerator connect(string _deviceId,string _serviceId,string _characteristicId)
     {
         if (!want_connect) yield break;
-
         quit();
+        connected = false;
+        isConnecting = true;
 
-        yield return mono.StartCoroutine(connect_device());
-        if (selectedDeviceId.Length == 0) yield break;
+        yield return mono.StartCoroutine(connect_device(_deviceId));
+        if (selectedDeviceId.Length == 0)
+        {
+            isConnecting = false;
+            yield break;
+        }
 
 
         Debug.Log("connecting device finish");
 
-        yield return mono.StartCoroutine(connect_service());
-        if (selectedServiceId.Length == 0) yield break;
+        yield return mono.StartCoroutine(connect_service(_serviceId));
+        if (selectedServiceId.Length == 0)
+        {
+            isConnecting = false;
+            yield break;
+        }
 
-        yield return mono.StartCoroutine(connect_read_characteristic());
-        if (selectedCharacteristicId.Length == 0) yield break;
+        yield return mono.StartCoroutine(connect_read_characteristic(_characteristicId));
+        if (selectedCharacteristicId.Length == 0)
+        {
+            isConnecting = false;
+            yield break;
+        }
 
         read_subscribe();
+        isConnecting = false;
     }
 
-    IEnumerator connect_device()
+    public IEnumerator scan_device()
+    {
+        isScanning = true;
+        Debug.Log("scanning device...");
+        BleApi.StartDeviceScan();
+        BleApi.ScanStatus status = BleApi.ScanStatus.AVAILABLE;
+        BleApi.DeviceUpdate device_res = new BleApi.DeviceUpdate();
+        do
+        {
+            status = BleApi.PollDevice(ref device_res, false);
+            if (status == BleApi.ScanStatus.AVAILABLE)
+            {
+                if (!devices.ContainsKey(device_res.id))
+                    devices[device_res.id] = new Dictionary<string, string>() {
+                            { "name", "" },
+                            { "isConnectable", "False" }
+                        };
+                if (device_res.nameUpdated)
+                    devices[device_res.id]["name"] = device_res.name;
+                if (device_res.isConnectableUpdated)
+                    devices[device_res.id]["isConnectable"] = device_res.isConnectable.ToString();
+            }
+            yield return 0;
+        } while (status == BleApi.ScanStatus.AVAILABLE || status == BleApi.ScanStatus.PROCESSING);
+        isScanning = false;
+    }
+
+    IEnumerator connect_device(string _deviceId)
     {
         Debug.Log("connecting device...");
 
@@ -88,7 +131,7 @@ public class IndoorBike_FTMS
                 if (device_res.isConnectableUpdated)
                     devices[device_res.id]["isConnectable"] = device_res.isConnectable.ToString();
                 // consider only devices which have a name and which are connectable
-                if (devices[device_res.id]["name"] == "APXPRO 46080" && devices[device_res.id]["isConnectable"] == "True")
+                if (device_res.id == _deviceId && devices[device_res.id]["isConnectable"] == "True")
                 {
                     //BleApi.Connect(device_res.id);
                     selectedDeviceId = device_res.id;
@@ -100,14 +143,14 @@ public class IndoorBike_FTMS
 
                 if (selectedDeviceId.Length == 0)
                 {
-                    Debug.LogError("device APXPRO 46080 not found!");
+                    Debug.Log("Stop Scanning, Unconnected");
                 }
             }
             yield return 0;
         } while (status == BleApi.ScanStatus.AVAILABLE || status == BleApi.ScanStatus.PROCESSING);
     }
-
-    IEnumerator connect_service()
+    //"{00001826-0000-1000-8000-00805f9b34fb}"
+    IEnumerator connect_service(string _serviceId)
     {
         Debug.Log("connecting service...");
         BleApi.ScanServices(selectedDeviceId);
@@ -120,7 +163,7 @@ public class IndoorBike_FTMS
             if (status == BleApi.ScanStatus.AVAILABLE)
             {
                 Debug.Log(service_res.uuid);
-                if (service_res.uuid == "{00001826-0000-1000-8000-00805f9b34fb}")
+                if (service_res.uuid == _serviceId)
                 {
                     selectedServiceId = service_res.uuid;
                     break;
@@ -130,14 +173,14 @@ public class IndoorBike_FTMS
             {
                 if (selectedServiceId.Length == 0)
                 {
-                    Debug.LogError("service {00001826-0000-1000-8000-00805f9b34fb} not found!");
+                    Debug.LogError("service " + _serviceId + " not found!");
                 }
             }
             yield return 0;
         } while (status == BleApi.ScanStatus.AVAILABLE || status == BleApi.ScanStatus.PROCESSING);
     }
-
-    IEnumerator connect_read_characteristic()
+    //"{00002ad2-0000-1000-8000-00805f9b34fb}"
+    IEnumerator connect_read_characteristic(string _characteristicId)
     {
         Debug.Log("connecting characteristic...");
         BleApi.ScanCharacteristics(selectedDeviceId, selectedServiceId);
@@ -149,7 +192,7 @@ public class IndoorBike_FTMS
             status = BleApi.PollCharacteristic(out characteristics_res, false);
             if (status == BleApi.ScanStatus.AVAILABLE)
             {
-                if (characteristics_res.uuid == "{00002ad2-0000-1000-8000-00805f9b34fb}")
+                if (characteristics_res.uuid == _characteristicId)
                 {
                     selectedCharacteristicId = characteristics_res.uuid;
                     break;
@@ -159,7 +202,7 @@ public class IndoorBike_FTMS
             {
                 if (selectedCharacteristicId.Length == 0)
                 {
-                    Debug.LogError("characteristic {00002ad2-0000-1000-8000-00805f9b34fb} not found!");
+                    Debug.LogError("characteristic " + _characteristicId + " not found!");
                 }
             }
             yield return 0;
