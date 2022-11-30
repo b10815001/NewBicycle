@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using TriangleNet.Geometry;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class RoadConstraint : MonoBehaviour
 {

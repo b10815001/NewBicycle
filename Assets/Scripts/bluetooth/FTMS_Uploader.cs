@@ -17,6 +17,7 @@ public class FTMS_Uploader : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (!ftms_connector.IsConnected()) return;
         if(update_duration > update_interval)
         {
             BicycleDataSender.sendData(ftms_connector.GetPower(), ftms_connector.GetRPM(), ftms_connector.GetSpeed(), cyclist.ended);

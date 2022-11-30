@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.IO;
 
 [ExecuteInEditMode]
 public class importTerrain : MonoBehaviour
 {
+#if UNITY_EDITOR
     [SerializeField]
     bool import_terrain;
     GameObject terrain_object;
@@ -129,4 +132,5 @@ public class importTerrain : MonoBehaviour
             terrain_data.SetTreeInstances(tree_instances, false);
         }
     }
+#endif
 }
