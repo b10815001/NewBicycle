@@ -24,6 +24,7 @@ public class PathFollower2 : MonoBehaviour
     public IndoorBike_FTMS_Connector connector;
     public float total_distance = 0;
     public float resistance = 0;
+    public bool use_resistance = false;
 
     // Start is called before the first frame update
     void Start()
@@ -175,7 +176,7 @@ public class PathFollower2 : MonoBehaviour
         Vector3 here = nodes[current_node].transform.position;
         Vector3 there = nodes[next_node].transform.position;
         slope = (there.y - here.y) / (Mathf.Sqrt(Mathf.Pow(there.x - here.x, 2) + Mathf.Pow(there.z - here.z, 2)));
-        resistance = Mathf.FloorToInt(getOutputSlope());
+        if (use_resistance) resistance = Mathf.FloorToInt(getOutputSlope());
     }
 
     public float getOutputSlope()
