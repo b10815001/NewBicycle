@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PathFollower2 : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class PathFollower2 : MonoBehaviour
     private float covered_distance = 0;
     public float slope = 0;
 
-    public float speed = 0.5f;
+    public float speedFactor = 0.5f;
     public Vector3 camera_height = Vector3.up * 3;
 
     public bool procedural = false;
@@ -25,6 +26,8 @@ public class PathFollower2 : MonoBehaviour
     public float total_distance = 0;
     public float resistance = 0;
     public bool use_resistance = false;
+
+    public Text speedFactorText;
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +45,7 @@ public class PathFollower2 : MonoBehaviour
 
     private void arclength()
     {
-        float distance = speed * connector.GetSpeed();
+        float distance = speedFactor * connector.GetSpeed();
         total_distance += distance;
         List<RoadArchitect.SplineN> nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
         int next_node = 0;
@@ -129,7 +132,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node + 1 < nodes.Count) ? (next_node + 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed * connector.GetSpeed());
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speedFactor * connector.GetSpeed());
                     }
                 }
                 else
@@ -166,7 +169,7 @@ public class PathFollower2 : MonoBehaviour
                         int next_next_node = (next_node - 1 > 0) ? (next_node - 1) : 0;
                         Vector3 look_at = nodes[next_node].pos + (nodes[next_next_node].pos - nodes[next_node].pos).normalized * covered_distance;
                         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(look_at, false, false)), Vector3.up);
-                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speed * connector.GetSpeed());
+                        transform.rotation = Quaternion.Lerp(last_rotation, transform.rotation, 0.1f * speedFactor * connector.GetSpeed());
                     }
                 }
             }
@@ -191,5 +194,16 @@ public class PathFollower2 : MonoBehaviour
     public void setEnd()
     {
         ended = true;
+    }
+
+    public void CloseGame()
+    {
+        Application.Quit();
+    }
+
+    public void SetSpeedFactor(float _speedFactor)
+    {
+        speedFactor = _speedFactor;
+        speedFactorText.text = "³t«×­¿²v: " + speedFactor.ToString("0.00");
     }
 }
