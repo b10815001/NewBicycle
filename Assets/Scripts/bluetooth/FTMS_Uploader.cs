@@ -21,6 +21,7 @@ public class FTMS_Uploader : MonoBehaviour
         if(update_duration > update_interval)
         {
             BicycleDataSender.sendBicycleData(ftms_connector.GetPower(), ftms_connector.GetRPM(), ftms_connector.GetSpeed(), cyclist.ended);
+            BicycleDataSender.sendSceneData("Dadu", cyclist.total_distance, cyclist.gameObject.transform.position.y - cyclist.camera_height.y, cyclist.resistance, cyclist.ended);
             if (cyclist.ended)
             {
                 cyclist.ended = false;

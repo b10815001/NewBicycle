@@ -15,13 +15,15 @@ public class PathFollower2 : MonoBehaviour
     public float slope = 0;
 
     public float speed = 0.5f;
-    private Vector3 camera_height = Vector3.up * 3;
+    public Vector3 camera_height = Vector3.up * 3;
 
     public bool procedural = false;
     private bool pause = true;
     public bool ended = false;
 
     public IndoorBike_FTMS_Connector connector;
+    public float total_distance = 0;
+    public float resistance = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +42,7 @@ public class PathFollower2 : MonoBehaviour
     private void arclength()
     {
         float distance = speed * connector.GetSpeed();
+        total_distance += distance;
         List<RoadArchitect.SplineN> nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
         int next_node = 0;
 
