@@ -11,6 +11,7 @@ public class IndoorBike_FTMS_Connector : MonoBehaviour
     public IndoorBike_FTMS connectorAPI;
     private bool preScanningStatus = false;
     public event EventHandler scanFinishedCallBack;
+    public Text resistanceShow;
     void Start()
     {
         connectorAPI = new IndoorBike_FTMS(this);
@@ -65,6 +66,7 @@ public class IndoorBike_FTMS_Connector : MonoBehaviour
     public void SetResistance(float val)
     {
         connectorAPI.write_resistance(val);
+        resistanceShow.text = "ªý¤O½Õ¾ã: " + Mathf.RoundToInt(val).ToString();
     }
 
     public string GetOutput()
