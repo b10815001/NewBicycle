@@ -1,7 +1,9 @@
 using RoadArchitect;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor.Search;
+#endif
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -9,6 +11,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 [ExecuteInEditMode]
 public class InterpolateMatrix : MonoBehaviour
 {
+#if UNITY_EDITOR
     [SerializeField]
     GameObject road_architect;
     [SerializeField]
@@ -92,4 +95,5 @@ public class InterpolateMatrix : MonoBehaviour
             }
         }
     }
+#endif
 }

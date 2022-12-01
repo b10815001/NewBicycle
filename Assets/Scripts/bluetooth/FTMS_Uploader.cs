@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FTMS_Uploader : MonoBehaviour
 {
     float update_duration = 0.0f;
     public float update_interval = 3.0f;
+    public Text update_interval_text;
     public IndoorBike_FTMS_Connector ftms_connector;
     public PathFollower2 cyclist = null;
     // Start is called before the first frame update
@@ -29,5 +31,11 @@ public class FTMS_Uploader : MonoBehaviour
             update_duration = 0.0f;
         }
         update_duration += Time.deltaTime;
+    }
+
+    public void ChangeUploadInterval(float _update_interval)
+    {
+        update_interval = _update_interval;
+        update_interval_text.text = "쨁또픚쾤: 쭯" + update_interval.ToString() + "ы쨁또�@┯";
     }
 }
