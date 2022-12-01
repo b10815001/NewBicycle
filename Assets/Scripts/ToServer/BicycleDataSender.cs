@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -65,8 +66,7 @@ public class BicycleDataSender
         string get_data = data_sender.sendTransmit(is_bicycle_initial ? bicycle_data_consequence_url : bicycle_data_initial_url, bicycle_data);
         if (debug)
         {
-            Debug.Log("bicycle_data: " + bicycle_data);
-            Debug.Log(get_data);
+            Debug.Log($"{get_data}\nbicycle_data: {bicycle_data}");
         }
 
         if (is_end)
@@ -75,8 +75,7 @@ public class BicycleDataSender
             get_data = data_sender.sendTransmit(bicycle_data_end_url, end_bicycle_data);
             if (debug)
             {
-                Debug.Log("end_bicycle_data: " + end_bicycle_data);
-                Debug.Log(get_data);
+                Debug.Log($"{get_data}\nend_bicycle_data: {end_bicycle_data}");
             }
         }
 
@@ -89,8 +88,7 @@ public class BicycleDataSender
         string get_data = data_sender.sendTransmit(is_scene_initial ? scene_data_consequence_url : scene_data_initial_url, scene_data);
         if (debug)
         {
-            Debug.Log("scene_data: " + scene_data);
-            Debug.Log(get_data);
+            Debug.Log($"{get_data}\nscene_data: {scene_data}");
         }
 
         if (is_end)

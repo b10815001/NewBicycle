@@ -19,7 +19,7 @@ public class testBicycleDataSender : MonoBehaviour
     {
         if (test)
         {
-            test= false;
+            test = false;
             BicycleDataSender.test();
         }
     }

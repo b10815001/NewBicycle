@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class FTMS_Uploader : MonoBehaviour
 {
+
     float update_duration = 0.0f;
     public float update_interval = 3.0f;
     public Text update_interval_text;

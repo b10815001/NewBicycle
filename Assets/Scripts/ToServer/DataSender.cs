@@ -39,15 +39,11 @@ public class DataSender
 
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             System.IO.Stream streamResponse = response.GetResponseStream();
+
             // get Token
-            System.IO.StreamReader streamRead = new System.IO.StreamReader(streamResponse, Encoding.UTF8);
-            char[] readBuff = new char[256];
-            int count = streamRead.Read(readBuff, 0, 256);
-            while (count > 0)
+            using (System.IO.StreamReader streamRead = new System.IO.StreamReader(streamResponse, Encoding.UTF8))
             {
-                string outputData = new string(readBuff, 0, count);
-                content += outputData;
-                count = streamRead.Read(readBuff, 0, 256);
+                content = streamRead.ReadToEnd();
             }
         }
         catch (WebException ex)
