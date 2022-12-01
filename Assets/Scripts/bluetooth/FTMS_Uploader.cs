@@ -20,7 +20,7 @@ public class FTMS_Uploader : MonoBehaviour
         if (!ftms_connector.IsConnected()) return;
         if(update_duration > update_interval)
         {
-            BicycleDataSender.sendData(ftms_connector.GetPower(), ftms_connector.GetRPM(), ftms_connector.GetSpeed(), cyclist.ended);
+            BicycleDataSender.sendBicycleData(ftms_connector.GetPower(), ftms_connector.GetRPM(), ftms_connector.GetSpeed(), cyclist.ended);
             if (cyclist.ended)
             {
                 cyclist.ended = false;
