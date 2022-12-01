@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 [ExecuteInEditMode]
 public class exportBicycleTerrain : MonoBehaviour
 {
+#if UNITY_EDITOR
     [SerializeField]
     string log_name;
     [SerializeField]
@@ -57,4 +60,5 @@ public class exportBicycleTerrain : MonoBehaviour
             }
         }
     }
+#endif
 }

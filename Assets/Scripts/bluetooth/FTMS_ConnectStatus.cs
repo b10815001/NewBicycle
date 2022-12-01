@@ -16,6 +16,15 @@ public class FTMS_ConnectStatus : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        uiText.text = ftms_connector.IsConnected() ? "已連接" : "未連接";
+        if (ftms_connector.IsConnected())
+        {
+            uiText.text = "已連接";
+            uiText.color = Color.green;
+        }
+        else
+        { 
+            uiText.text = "未連接";
+            uiText.color = Color.red;
+        }
     }
 }
