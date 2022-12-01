@@ -13,6 +13,7 @@ public class FTMS_DeviceSelector : MonoBehaviour
     public Button connectButton;
     public Text connectButtonText;
     public Button unConnectButton;
+    public Button endButton;
     public Transform deviceListParent;
     public GameObject deviceElementProto;
     [HideInInspector]
@@ -24,6 +25,10 @@ public class FTMS_DeviceSelector : MonoBehaviour
     [HideInInspector]
     public GameObject selectDevice;
     public Text scanButtonText;
+    float print_interval = 2.0f;
+    float print_duration = 0.0f;
+    bool scan_start = false;
+    HashSet<string> deviceInfoDisplay = new HashSet<string>();
 
     private void Start()
     {
@@ -42,7 +47,19 @@ public class FTMS_DeviceSelector : MonoBehaviour
         {
             scanButton.interactable = true;
             scanButtonText.text = "開始掃描";
+            scan_start = true;
         }
+
+        if (scan_start)
+        {
+            print_duration += Time.deltaTime;
+            if (print_duration > print_interval)
+            {
+                print_duration = 0.0f;
+                UpdateScan();
+            }
+        }
+
         if (selectDeviceId == "" || serviceId.text == "" || characteristicId.text == "")
         {
             connectButtonText.text = "開始連線";
@@ -62,28 +79,44 @@ public class FTMS_DeviceSelector : MonoBehaviour
         if (ftms_connector.IsConnected())
         {
             unConnectButton.interactable = true;
+            endButton.interactable = true;
         }
         else
         {
             unConnectButton.interactable = false;
+            endButton.interactable = false;
         }
     }
 
     public void StartScan()
     {
         if (ftms_connector.IsScanning()) return;
-        ftms_connector.StartScan();
-        ftms_connector.scanFinishedCallBack += this.FinishScan;
-    }
-
-    public void FinishScan(object sender,EventArgs eventArgs)
-    {
-        Debug.Log("FinishScan");
         for (int i = 0; i < deviceList.Count; i++)
         {
             Destroy(deviceList[i]);
         }
         deviceList.Clear();
+        ftms_connector.StartScan();
+        ftms_connector.scanFinishedCallBack += this.FinishScan;
+    }
+
+    public void UpdateScan()
+    {
+        Dictionary<string, Dictionary<string, string>> deviceInfo = ftms_connector.GetScanDevicesInfo();
+        foreach (KeyValuePair<string, Dictionary<string, string>> device in deviceInfo)
+        {
+            if (device.Value["name"] == string.Empty || deviceInfoDisplay.Contains(device.Key)) continue;//過濾掉無名裝置
+            GameObject gobj = Instantiate(deviceElementProto, deviceListParent);
+            gobj.transform.GetChild(0).GetComponent<Text>().text = device.Value["name"];
+            gobj.transform.GetChild(1).GetComponent<Text>().text = device.Key;
+            deviceList.Add(gobj);
+            deviceInfoDisplay.Add(device.Key);
+        }
+    }
+
+    public void FinishScan(object sender,EventArgs eventArgs)
+    {
+        Debug.Log("FinishScan");
         Dictionary<string, Dictionary<string, string>> deviceInfo = ftms_connector.GetScanDevicesInfo();
         foreach (KeyValuePair<string, Dictionary<string, string>> device in deviceInfo)
         {

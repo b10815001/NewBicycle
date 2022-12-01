@@ -187,4 +187,9 @@ public class PathFollower2 : MonoBehaviour
         else if (slope == 0) return 200;
         return (slope * 800 * 5) + 200;
     }
+
+    public void setEnd()
+    {
+        ended = true;
+    }
 }

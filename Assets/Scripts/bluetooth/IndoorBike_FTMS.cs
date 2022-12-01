@@ -159,10 +159,8 @@ public class IndoorBike_FTMS
         do
         {
             status = BleApi.PollService(out service_res, false);
-            Debug.Log(service_res.uuid);
             if (status == BleApi.ScanStatus.AVAILABLE)
             {
-                Debug.Log(service_res.uuid);
                 if (service_res.uuid == _serviceId)
                 {
                     selectedServiceId = service_res.uuid;
