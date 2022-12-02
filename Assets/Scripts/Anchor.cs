@@ -11,6 +11,8 @@ public class Anchor : MonoBehaviour
     private string file_name;
     [SerializeField]
     private string file_info_name;
+    [SerializeField]
+    private string file_tag_name;
 
     public void displayAnchors()
     {
@@ -24,13 +26,15 @@ public class Anchor : MonoBehaviour
         anchor_manager_building.transform.parent = anchor_manager.transform;
         anchor_manager_other.transform.parent = anchor_manager.transform;
 
-        using (StreamReader sr = new StreamReader($"Assets/{data_dir}/{file_name}"), sr_info = new StreamReader($"Assets/{data_dir}/{file_info_name}"))
+        using (StreamReader sr = new StreamReader($"Assets/{data_dir}/{file_name}"), sr_info = new StreamReader($"Assets/{data_dir}/{file_info_name}"), sr_tag = new StreamReader($"Assets/{data_dir}/{file_tag_name}"))
         {
             string[] lines = sr.ReadToEnd().Split('\n');
             string[] infos = sr_info.ReadToEnd().Split('\n');
+            string[] tags = sr_tag.ReadToEnd().Split('\n');
             int main_index = 0;
             int building_index = 0;
             int info_i = 0;
+            int tag_i = 0;
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] inputs = lines[i].Split(' ');
@@ -72,6 +76,14 @@ public class Anchor : MonoBehaviour
                         ball.GetComponent<Renderer>().sharedMaterial = material;
                         ball.transform.parent = building_polygon.transform;
                     }
+
+                    int tag_count = int.Parse(tags[tag_i++]);
+                    for (int tag_index = 0; tag_index < tag_count; tag_index++)
+                    {
+                        GameObject tag = new GameObject($"{tags[tag_i]}");
+                        tag.transform.parent = building_polygon.transform;
+                        tag_i++;
+                    }
                 }
                 else if (inputs[0] == "Other")
                 {
@@ -82,6 +94,14 @@ public class Anchor : MonoBehaviour
                     material.color = Color.blue;
                     ball.GetComponent<Renderer>().sharedMaterial = material;
                     ball.transform.parent = anchor_manager_other.transform;
+
+                    int tag_count = int.Parse(tags[tag_i++]);
+                    for (int tag_index = 0; tag_index < tag_count; tag_index++)
+                    {
+                        GameObject tag = new GameObject($"{tags[tag_i]}");
+                        tag.transform.parent = ball.transform;
+                        tag_i++;
+                    }
                 }
             }
         }
