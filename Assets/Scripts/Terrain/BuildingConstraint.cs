@@ -89,7 +89,7 @@ public class BuildingConstraint : MonoBehaviour
         {
             for (int point_index = 0; point_index < building_polygon.Length - 1; point_index++)
             {
-                constraint_kernel[Mathf.RoundToInt(building_polygon[point_index].y - y_base), Mathf.RoundToInt(building_polygon[point_index].x - x_base)] = bias.y / 294.9983f;
+                constraint_kernel[Mathf.RoundToInt(building_polygon[point_index].y - y_base), Mathf.RoundToInt(building_polygon[point_index].x - x_base)] = bias.y / terrain.terrainData.size.y;
             }
         }
 
@@ -99,7 +99,7 @@ public class BuildingConstraint : MonoBehaviour
             {
                 if (Utils.isPointInPolygon(building_polygon, new Vector2(x_base + i, y_base + j)))
                 {
-                    constraint_kernel[j, i] = bias.y / 294.9983f;
+                    constraint_kernel[j, i] = bias.y / terrain.terrainData.size.y;
                 }
             }
         }

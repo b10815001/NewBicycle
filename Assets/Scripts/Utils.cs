@@ -24,6 +24,42 @@ public static class Utils
         return (hitPointTerX, hitPointTerZ);
     }
 
+    public static Vector2 getWorldPos(Terrain terrain, int x, int y)
+    {
+        var terrain_position = terrain.transform.position;
+        TerrainData terrainData = terrain.terrainData;
+        var terrain_size = terrainData.size;
+        float relative_hitTerX =  (float)x / terrainData.heightmapResolution;
+        float relative_hitTerZ = (float)y / terrainData.heightmapResolution;
+        return new Vector2(relative_hitTerX * terrain_size.x + terrain_position.x, relative_hitTerZ * terrain_size.z + terrain_position.z);
+    }
+
+    public static (Vector2 neartest, int index) getNearest(Vector2[] points, Vector2 target)
+    {
+        float dist_min = float.MaxValue;
+        int index = 0;
+        for (int i = 0; i < points.Length; i++)
+        {
+            float dist = Vector2.Distance(points[i], target);
+            if (dist < dist_min)
+            {
+                dist_min = dist;
+                index = i;
+            }
+        }
+        return (points[index], index);
+    }
+
+    public static Vector2[] toVec2(Vector3[] points)
+    {
+        Vector2[] coords = new Vector2[points.Length];
+        for (int i = 0; i < points.Length; i++)
+        {
+            coords[i] = new Vector2(points[i].x, points[i].z);
+        }
+        return coords;
+    }
+
     //***********************************************************************
     //
     // * Returns which side of the edge the line (x,y) is on. The return value
@@ -121,5 +157,11 @@ public static class Utils
         }
 
         return oddNodes;
+    }
+
+    static public float getSFunction(float a, float b, float step)
+    {
+        float weight = (Mathf.Sin(step * Mathf.PI - Mathf.PI / 2) + 1) / 2;
+        return (1 - weight) * a + weight * b;
     }
 }
