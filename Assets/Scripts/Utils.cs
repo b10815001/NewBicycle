@@ -34,7 +34,7 @@ public static class Utils
         return new Vector2(relative_hitTerX * terrain_size.x + terrain_position.x, relative_hitTerZ * terrain_size.z + terrain_position.z);
     }
 
-    public static (Vector2 neartest, int index) getNearest(Vector2[] points, Vector2 target)
+    public static (Vector2 neartest, int index, float distance) getNearest(Vector2[] points, Vector2 target)
     {
         float dist_min = float.MaxValue;
         int index = 0;
@@ -47,7 +47,7 @@ public static class Utils
                 index = i;
             }
         }
-        return (points[index], index);
+        return (points[index], index, dist_min);
     }
 
     public static Vector2[] toVec2(Vector3[] points)

@@ -17,7 +17,9 @@ public class InterpolateMatrix : MonoBehaviour
     [SerializeField]
     bool get_road_constraint = false;
     [SerializeField]
-    bool do_constraint = true;
+    bool do_segment_constraint = true;
+    [SerializeField]
+    bool do_constraint = false;
     [SerializeField]
     int u_devide = 10;
     [SerializeField]
@@ -28,6 +30,8 @@ public class InterpolateMatrix : MonoBehaviour
     bool debug = false;
     [SerializeField]
     Terrain terrain;
+    [SerializeField]
+    Terrain[] terrains;
     Road road;
     Vector3[] road_polygon;
     Vector3[] road_right_polygon;
@@ -39,6 +43,7 @@ public class InterpolateMatrix : MonoBehaviour
     Vector2[] road_right_spline2d;
     Vector2[] road_left_spline2d;
     Vector3[] road_rights;
+    Vector3[] road_spline_points;
     // Update is called once per frame
     void Update()
     {
@@ -122,9 +127,9 @@ public class InterpolateMatrix : MonoBehaviour
             }
         }
 
-        if (do_constraint)
+        if (do_segment_constraint)
         {
-            do_constraint = false;
+            do_segment_constraint = false;
 
             //Matrix<double> A = DenseMatrix.OfArray(new double[,] {
             //    {1,1,1,1},
@@ -231,7 +236,7 @@ public class InterpolateMatrix : MonoBehaviour
                 {
                     Vector2 pos2d = Utils.getWorldPos(terrain, x_base + i, y_base + j);
                     float terrain_height = terrain.SampleHeight(new Vector3(pos2d.x, 0, pos2d.y)) + terrain.transform.position.y;
-                    
+
                     // right extend
                     if (Utils.pointInPolygon(road_right_polygon2d, pos2d))
                     {
@@ -270,6 +275,66 @@ public class InterpolateMatrix : MonoBehaviour
             //material_c.color = Color.cyan;
             //c.GetComponent<Renderer>().sharedMaterial = material_c;
             //c.transform.parent = cube_manager.transform;
+        }
+
+        if (do_constraint)
+        {
+            do_constraint = false;
+
+            doRoadConstraint(2, ref terrains);
+        }
+    }
+
+    void doRoadConstraint(int road_index, ref Terrain[] terrains)
+    {
+        if (road_architect.transform.GetChild(2).gameObject.TryGetComponent<Road>(out road))
+        {
+            for (int terrain_index = 0; terrain_index < terrains.Length; terrain_index++)
+            {
+                terrain = terrains[terrain_index];
+
+                float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
+
+                Vector3 road_point_pos, road_tangent;
+                int node_count = road.spline.nodes.Count - 1;
+                float step = 1.0f / v_devide;
+                road_spline_points = new Vector3[node_count * v_devide + 1];
+                for (int segment_index = 0; segment_index < node_count; segment_index++)
+                {
+                    for (int segment_v = 0; segment_v < v_devide; segment_v++)
+                    {
+                        road.getPosAndTangent(segment_index, step * segment_v, out road_point_pos, out road_tangent);
+                        road_spline_points[segment_index * v_devide + segment_v] = road_point_pos;
+                    }
+                }
+                road.getPosAndTangent(node_count - 1, 1, out road_point_pos, out road_tangent);
+                road_spline_points[node_count * v_devide] = road_point_pos;
+
+                road_spline2d = Utils.toVec2(road_spline_points);
+                for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
+                {
+                    for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
+                    {
+                        Vector2 pos2d = Utils.getWorldPos(terrain, i, j);
+                        float terrain_height = terrain.SampleHeight(new Vector3(pos2d.x, 0, pos2d.y)) + terrain.transform.position.y;
+                        var nearest_point = Utils.getNearest(road_spline2d, pos2d);
+                        if (nearest_point.distance < road.laneWidth + road.shoulderWidth) // in road
+                        {
+                            constraint_kernel[j, i] = (road_spline_points[nearest_point.index].y - terrain.transform.position.y - 0.5f) / terrain.terrainData.size.y;
+                        }
+                        else if (nearest_point.distance < road.laneWidth + road.shoulderWidth + extend_width) // in extend
+                        {
+                            float u = (nearest_point.distance - road.laneWidth - road.shoulderWidth) / extend_width;
+                            constraint_kernel[j, i] = (Utils.getSFunction(road_spline_points[nearest_point.index].y, terrain_height, u) - terrain.transform.position.y) / terrain.terrainData.size.y;
+                        }
+                    }
+                }
+                terrain.terrainData.SetHeights(0, 0, constraint_kernel);
+            }
+        }
+        else
+        {
+            Debug.LogError("Road.cs not be loaded");
         }
     }
 #endif
