@@ -66,7 +66,7 @@ public class IndoorBike_FTMS_Connector : MonoBehaviour
     public void SetResistance(float val)
     {
         connectorAPI.write_resistance(val);
-        resistanceShow.text = "ªý¤O½Õ¾ã: " + Mathf.RoundToInt(val).ToString();
+        resistanceShow.text = "Resistance: " + Mathf.RoundToInt(val).ToString();
     }
 
     public string GetOutput()

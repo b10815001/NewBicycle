@@ -18,12 +18,12 @@ public class FTMS_ConnectStatus : MonoBehaviour
     {
         if (ftms_connector.IsConnected())
         {
-            uiText.text = "已連接";
+            uiText.text = "Connected";
             uiText.color = Color.green;
         }
         else
         { 
-            uiText.text = "未連接";
+            uiText.text = "Disconnected";
             uiText.color = Color.red;
         }
     }

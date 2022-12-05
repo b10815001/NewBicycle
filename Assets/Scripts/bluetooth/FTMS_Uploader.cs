@@ -37,7 +37,7 @@ public class FTMS_Uploader : MonoBehaviour
     public void ChangeUploadInterval(float _update_interval)
     {
         update_interval = _update_interval;
-        update_interval_text.text = "쨁또픚쾤: 쭯" + update_interval.ToString("0.00") + "ы쨁또�@┯";
+        update_interval_text.text = "Frequency: Every " + update_interval.ToString("0.00") + " seconds";
     }
 
     public void SetUploadSwitch(bool _uploadSwitch)

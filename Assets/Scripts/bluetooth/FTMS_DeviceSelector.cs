@@ -41,13 +41,13 @@ public class FTMS_DeviceSelector : MonoBehaviour
         if (ftms_connector.IsScanning())
         {
             scanButton.interactable = false;
-            scanButtonText.text = "掃描中...";
+            scanButtonText.text = "Scanning...";
             scanning = true;
         }
         else
         {
             scanButton.interactable = true;
-            scanButtonText.text = "開始掃描裝置";
+            scanButtonText.text = "Start Device Scan";
             scanning = false;
         }
 
@@ -63,17 +63,17 @@ public class FTMS_DeviceSelector : MonoBehaviour
 
         if (selectDeviceId == "" || serviceId.text == "" || characteristicId.text == "")
         {
-            connectButtonText.text = "開始連線";
+            connectButtonText.text = "Unavailable";
             connectButton.interactable = false;
         }
         else if (ftms_connector.IsConnecting())
         {
-            connectButtonText.text = "連線中...";
+            connectButtonText.text = "Connecting...";
             connectButton.interactable = false;
         }
         else
         {
-            connectButtonText.text = "開始連線";
+            connectButtonText.text = "Connect";
             connectButton.interactable = true;
         }
 

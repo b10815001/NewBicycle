@@ -204,6 +204,6 @@ public class PathFollower2 : MonoBehaviour
     public void SetSpeedFactor(float _speedFactor)
     {
         speedFactor = _speedFactor;
-        speedFactorText.text = "³t«×­¿²v: " + speedFactor.ToString("0.00");
+        speedFactorText.text = "Speed Multiplier: " + speedFactor.ToString("0.00");
     }
 }
