@@ -287,6 +287,7 @@ public class InterpolateMatrix : MonoBehaviour
         {
             do_constraint = false;
 
+            terrains = new Terrain[] { terrain };
             doRoadConstraint(2, ref terrains);
         }
 

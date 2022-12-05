@@ -17,6 +17,12 @@ public class Spliter : MonoBehaviour
     bool fetch_terrain;
     [SerializeField]
     int resolution;
+    [SerializeField]
+    Terrain t1;
+    [SerializeField]
+    Terrain t2;
+    [SerializeField]
+    bool neighbor;
     // Update is called once per frame
     void Update()
     {
@@ -33,6 +39,14 @@ public class Spliter : MonoBehaviour
             GameObject new_terrain = SplitTerrain.fetchTerrain(terrain, locator.transform.position.x, locator.transform.position.z, 100, 100, resolution);
             GameObject new_terrain2 = SplitTerrain.fetchTerrain(terrain, locator.transform.position.x - 100, locator.transform.position.z, 100, 100, resolution);
             GameObject new_terrain3 = SplitTerrain.fetchTerrain(terrain, locator.transform.position.x, locator.transform.position.z + 100, 100, 100, resolution);
+        }
+
+        if (neighbor)
+        {
+            neighbor = false;
+            t1.SetNeighbors(t2, null, null, null);
+            t2.SetNeighbors(null, null, t1, null);
+            Debug.Log(t1.leftNeighbor);
         }
     }
 }
