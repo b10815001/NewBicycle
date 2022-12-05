@@ -43,8 +43,9 @@ public class bgAsset : bgComponent
             float divide = 150.0f;
             width = image.width / divide;
             height = image.height / divide;
-            mat = new Material(Shader.Find("Diffuse - Worldspace"));
+            mat = new Material(Shader.Find("Standard"));
             mat.SetTexture("_MainTex",image);
+            mat.enableInstancing = true;
         }
         else if (asset_type == "model")
         {
@@ -96,7 +97,7 @@ public class bgAsset : bgComponent
                 go = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 GameObject.Destroy(go.GetComponent<MeshCollider>());
                 MeshRenderer mr = go.GetComponent<MeshRenderer>();
-                mr.material.mainTexture = image;
+                mr.material = mat;
                 go.transform.localScale = new Vector3(width * scale.Item1, height * scale.Item2, 1.0f);
             }
             else if (asset_type == "model")

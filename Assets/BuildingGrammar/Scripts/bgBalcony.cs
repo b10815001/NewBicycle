@@ -13,6 +13,7 @@ public class bgBalcony : bgComponent
 
     float pillar_width = 0.15f;
     public float pillar_interval = 0.4f;
+    Material balcony_material = null;
     public bgBalcony(List<string> _input_parameter, List<string> _component_parameter, List<string> _commands, List<List<string>> _commands_parameter) : base(_input_parameter, _component_parameter, _commands, _commands_parameter)
     {
 
@@ -23,7 +24,12 @@ public class bgBalcony : bgComponent
         go = new GameObject("Balcony:" + name);
         MeshFilter mf = go.AddComponent<MeshFilter>();
         MeshRenderer mr = go.AddComponent<MeshRenderer>();
-        mr.material = new Material(Shader.Find("Diffuse"));
+        if (balcony_material == null)
+        {
+            balcony_material = new Material(Shader.Find("Diffuse"));
+            balcony_material.enableInstancing = true;
+        }
+        mr.material = balcony_material;
         Mesh mesh = mf.mesh;
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();

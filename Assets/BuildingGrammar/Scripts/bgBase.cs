@@ -11,6 +11,7 @@ public class bgBase : bgComponent
     float floor_height = float.MaxValue;
     int vertex_read = 0;
     bool runtime_vertex = false;
+    Material roof_material = null;
     public bgBase(List<string> _input_parameter, List<string> _component_parameter, List<string> _commands, List<List<string>> _commands_parameter) : base(_input_parameter, _component_parameter, _commands, _commands_parameter)
     {
 
@@ -186,8 +187,13 @@ public class bgBase : bgComponent
         pitched_roof_mesh.triangles = pitched_roof_triangles;
         pitched_roof_mesh.RecalculateNormals();
         //pitched_roof_mesh.uv = roof_uv_generate(pitched_roof_mesh,4.0f);
-        pitched_roof_mr.material = new Material(Shader.Find("Diffuse - Worldspace"));
-        pitched_roof_mr.material.mainTexture = Resources.Load<Texture2D>("roof");
+        if (roof_material == null)
+        {
+            roof_material = new Material(Shader.Find("Diffuse - Worldspace"));
+            roof_material.mainTexture = Resources.Load<Texture2D>("roof");
+            roof_material.enableInstancing = true;
+        }
+        pitched_roof_mr.material = roof_material;
         pitched_roof.transform.parent = go.transform;
         pitched_roof.transform.localPosition = new Vector3(0, height, 0);
 

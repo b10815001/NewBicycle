@@ -67,7 +67,7 @@ public class bgWall : bgComponent
         
         //mr.sharedMaterial = background.mat;
         mr.material = background.mat;
-
+        //mr.material.shader = Shader.Find("Diffuse - Worldspace");
         //Material newmat = new Material(mat);
         //mr.sharedMaterial = newmat;
 

@@ -7,7 +7,7 @@ public class FTMS_Uploader : MonoBehaviour
 {
     public bool uploadSwitch = true;
     float update_duration = 0.0f;
-    public float update_interval = 3.0f;
+    public float update_interval = 0.1f;
     public Text update_interval_text;
     public IndoorBike_FTMS_Connector ftms_connector;
     public PathFollower2 cyclist = null;
