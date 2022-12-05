@@ -7,6 +7,11 @@ using UnityEngine;
 
 public static class Utils
 {
+    public static (int x, int y) getTerrainDataPos(Terrain terrain, float x, float z)
+    {
+        return getTerrainDataPos(terrain, new Vector3(x, 0, z));
+    }
+
     public static (int x, int y) getTerrainDataPos(Terrain terrain, Vector3 world_pos)
     {
         var terrain_position = terrain.transform.position;

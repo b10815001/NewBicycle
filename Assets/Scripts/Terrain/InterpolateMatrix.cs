@@ -7,6 +7,8 @@ using UnityEditor.Search;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using System.Runtime.ConstrainedExecution;
+using UnityEngine.UIElements;
 
 [ExecuteInEditMode]
 public class InterpolateMatrix : MonoBehaviour
@@ -32,6 +34,10 @@ public class InterpolateMatrix : MonoBehaviour
     Terrain terrain;
     [SerializeField]
     Terrain[] terrains;
+    [SerializeField]
+    GameObject terrain_split_manager;
+    [SerializeField]
+    bool consistency;
     Road road;
     Vector3[] road_polygon;
     Vector3[] road_right_polygon;
@@ -282,6 +288,25 @@ public class InterpolateMatrix : MonoBehaviour
             do_constraint = false;
 
             doRoadConstraint(2, ref terrains);
+        }
+
+        if (consistency)
+        {
+            consistency = false;
+
+            Vector3 size = terrains[0].terrainData.size;
+            Vector3 pos = terrains[0].transform.position;
+            terrains[0].terrainData.heightmapResolution = 129;
+            terrains[0].terrainData.size = size;
+            terrains[0].transform.position = pos;
+            //for (int i = 0; i < terrain_split_manager.transform.childCount; i++)
+            //{
+            //    Terrain _terrain;
+            //    if (terrain_split_manager.transform.GetChild(i).gameObject.TryGetComponent<Terrain>(out _terrain))
+            //    {
+            //        _terrain.terrainData.heightmapResolution = 129;
+            //    }
+            //}
         }
     }
 
