@@ -15,7 +15,8 @@ public class PathFollower2 : MonoBehaviour
     private float covered_distance = 0;
     public float slope = 0;
 
-    public float speedFactor = 0.5f;
+    public float speedFactor = 0.0056f; //1000/3600 * 0.02
+    float speedTerm = 1.0f;
     public Vector3 camera_height = Vector3.up * 3;
 
     public bool procedural = false;
@@ -27,7 +28,7 @@ public class PathFollower2 : MonoBehaviour
     public float resistance = 0;
     public bool use_resistance = false;
 
-    public Text speedFactorText;
+    public Text speedTermText;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +41,10 @@ public class PathFollower2 : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) pause = !pause;
+    }
+
+    void FixedUpdate()
+    {
         if (!pause) arclength();
     }
 
@@ -201,9 +206,9 @@ public class PathFollower2 : MonoBehaviour
         Application.Quit();
     }
 
-    public void SetSpeedFactor(float _speedFactor)
+    public void SetSpeedTerm(float _speedTerm)
     {
-        speedFactor = _speedFactor;
-        speedFactorText.text = "Speed Multiplier: " + speedFactor.ToString("0.00");
+        speedTerm = _speedTerm;
+        speedTermText.text = "Speed Multiplier: " + speedTerm.ToString();
     }
 }
