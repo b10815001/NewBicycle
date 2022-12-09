@@ -363,10 +363,28 @@ public class IndoorBike_FTMS
 
     public void write_resistance(float val)
     {
+        if (val < 0.0f)
+            val = 0.0f;
+        if (val == Mathf.Infinity)
+        {
+            Debug.Log("Infinity");
+            val = 0.0f;
+        }
+        if (val == Mathf.NegativeInfinity)
+        {
+            Debug.Log("NegativeInfinity");
+            val = 0.0f;
+        }
+        if (float.IsNaN(val))
+        {
+            Debug.Log("nan");
+            val = 0.0f;
+        }
         write_resistance(Mathf.FloorToInt(val));
     }
     public void write_resistance(int val)
     {
+        sended_resistance = val;
         BleApi.SubscribeCharacteristic_Write(selectedDeviceId, selectedServiceId, "{00002ad9-0000-1000-8000-00805f9b34fb}", false);
         Write("00");
         byte resistance1 = Convert.ToByte(((val % 256) + 256) % 256);

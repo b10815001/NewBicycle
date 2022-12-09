@@ -15,7 +15,7 @@ public class PathFollower2 : MonoBehaviour
     private float covered_distance = 0;
     public float slope = 0;
 
-    public float speedFactor = 0.0056f; //1000/3600 * 0.02
+    float speedFactor = 0.0056f; //1000/3600 * 0.02
     float speedTerm = 1.0f;
     public Vector3 camera_height = Vector3.up * 3;
 
@@ -50,7 +50,7 @@ public class PathFollower2 : MonoBehaviour
 
     private void arclength()
     {
-        float distance = speedFactor * connector.GetSpeed();
+        float distance = speedTerm * speedFactor * connector.GetSpeed();
         total_distance += distance;
         List<RoadArchitect.SplineN> nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
         int next_node = 0;
@@ -190,10 +190,11 @@ public class PathFollower2 : MonoBehaviour
     public float getOutputSlope()
     {
         if (slope > 0.2f) slope = 0.2f; //cap
-        if (slope < -0.2f) return -0.2f;
-        if (slope < 0) return (slope + 0.2f) * 5 * 200;
-        else if (slope == 0) return 200;
-        return (slope * 800 * 5) + 200;
+        if (slope < -0.2f) slope = -0.2f;
+        return slope;
+        //if (slope < 0) return (slope + 0.2f) * 5 * 200;
+        //else if (slope == 0) return 200;
+        //return (slope * 800 * 5) + 200;
     }
 
     public void setEnd()
