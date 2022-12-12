@@ -131,7 +131,11 @@ public class PathFollower2 : MonoBehaviour
                     if (distance == 0)
                     {
                         Vector3 linear_pos = nodes[current_node].pos + (nodes[next_node].pos - nodes[current_node].pos).normalized * covered_distance;
-                        transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false));
+                        Vector3 current_pos, current_tangent;
+                        roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
+                        transform.position = camera_height + current_pos;
+                        current_tangent = current_tangent.normalized;
+                        slope = current_tangent.y;
                         Quaternion last_rotation = transform.rotation;
 
                         int next_next_node = (next_node + 1 < nodes.Count) ? (next_node + 1) : 0;
@@ -168,7 +172,11 @@ public class PathFollower2 : MonoBehaviour
                     if (distance == 0)
                     {
                         Vector3 linear_pos = nodes[current_node].pos + (nodes[next_node].pos - nodes[current_node].pos).normalized * covered_distance;
-                        transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValue(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false));
+                        Vector3 current_pos, current_tangent;
+                        roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
+                        transform.position = camera_height + current_pos;
+                        current_tangent = current_tangent.normalized;
+                        slope = current_tangent.y;
                         Quaternion last_rotation = transform.rotation;
 
                         int next_next_node = (next_node - 1 > 0) ? (next_node - 1) : 0;
@@ -181,16 +189,18 @@ public class PathFollower2 : MonoBehaviour
         }
 
         //slope
-        Vector3 here = nodes[current_node].transform.position;
-        Vector3 there = nodes[next_node].transform.position;
-        slope = (there.y - here.y) / (Mathf.Sqrt(Mathf.Pow(there.x - here.x, 2) + Mathf.Pow(there.z - here.z, 2)));
-        if (use_resistance) resistance = Mathf.FloorToInt(getOutputSlope());
+        //Vector3 here = nodes[current_node].transform.position;
+        //Vector3 there = nodes[next_node].transform.position;
+        //slope = (there.y - here.y) / (Mathf.Sqrt(Mathf.Pow(there.x - here.x, 2) + Mathf.Pow(there.z - here.z, 2)));
+        Debug.Log(slope);
+        if (use_resistance)
+            resistance = Mathf.FloorToInt(getOutputSlope());
     }
 
     public float getOutputSlope()
     {
-        if (slope > 0.2f) slope = 0.2f; //cap
-        if (slope < -0.2f) slope = -0.2f;
+        slope = Mathf.Min(slope, 0.2f);
+        slope = Mathf.Max(-0.2f, slope);
         return slope;
         //if (slope < 0) return (slope + 0.2f) * 5 * 200;
         //else if (slope == 0) return 200;

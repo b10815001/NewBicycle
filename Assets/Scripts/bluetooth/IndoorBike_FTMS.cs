@@ -17,15 +17,15 @@ public class IndoorBike_FTMS
     public bool isConnecting = false;
 
     public string output;
-    public float speed = 1.0f; public bool has_speed = false;
-    public float average_speed; public bool has_average_speed = false;
-    public float rpm = 0.0f; public bool has_rpm = false;
-    public float average_rpm; public bool has_average_rpm = false;
-    public float distance; public bool has_distance = false;
-    public float resistance; public bool has_resistance = false;
-    public float power = 0.0f; public bool has_power = false;
-    public float average_power; public bool has_average_power = false;
-    public float expended_energy; public bool has_expended_energy = false;
+    public float speed = 0.0f;      public bool has_speed = false;
+    public float average_speed;     public bool has_average_speed = false;
+    public float rpm = 0.0f;        public bool has_rpm = false;
+    public float average_rpm;       public bool has_average_rpm = false;
+    public float distance;          public bool has_distance = false;
+    public float resistance;        public bool has_resistance = false;
+    public float power = 0.0f;      public bool has_power = false;
+    public float average_power;     public bool has_average_power = false;
+    public float expended_energy;   public bool has_expended_energy = false;
 
     string lastError;
 
