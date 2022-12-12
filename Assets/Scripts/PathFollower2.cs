@@ -192,7 +192,6 @@ public class PathFollower2 : MonoBehaviour
         //Vector3 here = nodes[current_node].transform.position;
         //Vector3 there = nodes[next_node].transform.position;
         //slope = (there.y - here.y) / (Mathf.Sqrt(Mathf.Pow(there.x - here.x, 2) + Mathf.Pow(there.z - here.z, 2)));
-        Debug.Log(slope);
         if (use_resistance)
             resistance = Mathf.FloorToInt(getOutputSlope());
     }
@@ -220,6 +219,6 @@ public class PathFollower2 : MonoBehaviour
     public void SetSpeedTerm(float _speedTerm)
     {
         speedTerm = _speedTerm;
-        speedTermText.text = "Speed Multiplier: " + speedTerm.ToString();
+        speedTermText.text = "Speed Multiplier: " + speedTerm.ToString("0.00");
     }
 }
