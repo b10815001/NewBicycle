@@ -1966,5 +1966,15 @@ namespace RoadArchitect
         {
             spline.GetSplineValueBoth(spline.GetClosestParam(spline.nodes[control_id].pos + (spline.nodes[control_id + 1].pos - spline.nodes[control_id].pos) * segment, false, false), out pos, out tangent);
         }
+
+        public void getPosAndTangent(Vector2 target2d, out Vector3 pos, out Vector3 tangent)
+        {
+            getPosAndTangent(new Vector3(target2d.x, 0, target2d.y), out pos, out tangent);
+        }
+
+        public void getPosAndTangent(Vector3 target, out Vector3 pos, out Vector3 tangent)
+        {
+            spline.GetSplineValueBoth(spline.GetClosestParam(target, false, false), out pos, out tangent);
+        }
     }
 }

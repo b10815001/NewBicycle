@@ -27,6 +27,8 @@ public class InterpolateMatrix : MonoBehaviour
     [SerializeField]
     int v_devide = 10;
     [SerializeField]
+    float boundary_width = 0.05f;
+    [SerializeField]
     float extend_width = 10.0f;
     [SerializeField]
     bool debug = false;
@@ -287,7 +289,7 @@ public class InterpolateMatrix : MonoBehaviour
         {
             do_constraint = false;
 
-            terrains = new Terrain[] { terrain };
+            //terrains = new Terrain[] { terrain };
             doRoadConstraint(2, ref terrains);
         }
 
@@ -321,37 +323,26 @@ public class InterpolateMatrix : MonoBehaviour
 
                 float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
 
-                Vector3 road_point_pos, road_tangent;
-                int node_count = road.spline.nodes.Count - 1;
-                float step = 1.0f / v_devide;
-                road_spline_points = new Vector3[node_count * v_devide + 1];
-                for (int segment_index = 0; segment_index < node_count; segment_index++)
-                {
-                    for (int segment_v = 0; segment_v < v_devide; segment_v++)
-                    {
-                        road.getPosAndTangent(segment_index, step * segment_v, out road_point_pos, out road_tangent);
-                        road_spline_points[segment_index * v_devide + segment_v] = road_point_pos;
-                    }
-                }
-                road.getPosAndTangent(node_count - 1, 1, out road_point_pos, out road_tangent);
-                road_spline_points[node_count * v_devide] = road_point_pos;
-
-                road_spline2d = Utils.toVec2(road_spline_points);
                 for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
                 {
                     for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
                     {
                         Vector2 pos2d = Utils.getWorldPos(terrain, i, j);
-                        float terrain_height = terrain.SampleHeight(new Vector3(pos2d.x, 0, pos2d.y)) + terrain.transform.position.y;
-                        var nearest_point = Utils.getNearest(road_spline2d, pos2d);
-                        if (nearest_point.distance < road.laneWidth + road.shoulderWidth) // in road
+                        Vector3 pos = new Vector3(pos2d.x, 0, pos2d.y);
+                        pos.y = terrain.SampleHeight(pos) + terrain.transform.position.y;
+                        Vector3 nearest_point, nearest_tangent;
+                        road.getPosAndTangent(pos, out nearest_point, out nearest_tangent);
+                        float distance = Vector2.Distance(new Vector2(nearest_point.x, nearest_point.z), pos2d);
+                        float road_height = nearest_point.y - 0.5f;
+                        if (distance < road.laneWidth + road.shoulderWidth + boundary_width) // in road
                         {
-                            constraint_kernel[j, i] = (road_spline_points[nearest_point.index].y - terrain.transform.position.y - 0.5f) / terrain.terrainData.size.y;
+                            constraint_kernel[j, i] = (road_height - terrain.transform.position.y) / terrain.terrainData.size.y;
                         }
-                        else if (nearest_point.distance < road.laneWidth + road.shoulderWidth + extend_width) // in extend
+                        else if (distance < road.laneWidth + road.shoulderWidth + extend_width) // in extend
                         {
-                            float u = (nearest_point.distance - road.laneWidth - road.shoulderWidth) / extend_width;
-                            constraint_kernel[j, i] = (Utils.getSFunction(road_spline_points[nearest_point.index].y, terrain_height, u) - terrain.transform.position.y) / terrain.terrainData.size.y;
+                            float u = (distance - road.laneWidth - road.shoulderWidth) / extend_width;
+                            //u = Mathf.Max(u, boundary_width);
+                            constraint_kernel[j, i] = (Utils.getSFunction(road_height, pos.y, u) - terrain.transform.position.y) / terrain.terrainData.size.y;
                         }
                     }
                 }
