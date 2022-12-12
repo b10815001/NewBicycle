@@ -219,6 +219,9 @@ public class IndoorBike_FTMS
 
     public void quit()
     {
+        isSubscribed = false;
+        connected = false;
+        isConnecting = false;
         BleApi.Quit();
     }
 

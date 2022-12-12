@@ -20,7 +20,7 @@ public class PathFollower2 : MonoBehaviour
     public Vector3 camera_height = Vector3.up * 3;
 
     public bool procedural = false;
-    private bool pause = true;
+    private bool pause = false;
     public bool ended = false;
 
     public IndoorBike_FTMS_Connector connector;
