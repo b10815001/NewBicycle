@@ -4,6 +4,13 @@ using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
 
+public enum TRANSMITSTATUS
+{
+    closed,
+    success,
+    fail
+}
+
 public class BicycleDataSender
 {
     static string auth_url = "http://140.121.197.90:8081/auth/";
@@ -30,6 +37,7 @@ public class BicycleDataSender
 
     static int times;
     static bool debug = true;
+    static public TRANSMITSTATUS transmit_status = TRANSMITSTATUS.closed;
 
     static public void initial()
     {
@@ -73,6 +81,23 @@ public class BicycleDataSender
         {
             string end_bicycle_data = $"{{\n\"maxPower\":{max_power},\n\"averagePower\":{average_power},\n\"maxRotateSpeed\":{max_rotate_speed},\n\"averageRotateSpeed\":{average_rotate_speed},\n\"maxSpeed\":{max_speed},\n\"averageSpeed\":{average_speed}\n}}";
             get_data = data_sender.sendTransmit(bicycle_data_end_url, end_bicycle_data);
+
+            //"Success create cycleData."
+            //"Success adding cycle data."
+            //"Stopping create data successfully."
+            if (get_data.Contains("Success"))
+            {
+                transmit_status = TRANSMITSTATUS.success;
+            }
+            else if (get_data.Contains("Fail"))
+            {
+                transmit_status = TRANSMITSTATUS.fail;
+            }
+            else if (get_data.Contains("Stopping"))
+            {
+                transmit_status = TRANSMITSTATUS.closed;
+            }
+
             if (debug)
             {
                 Debug.Log($"{get_data}\nend_bicycle_data: {end_bicycle_data}");
