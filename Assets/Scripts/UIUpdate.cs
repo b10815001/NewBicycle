@@ -17,7 +17,9 @@ public class UIUpdate : MonoBehaviour
     RawImage transmit_image;
     [SerializeField]
     IndoorBike_FTMS_Connector ftms_connector;
-    
+    [SerializeField]
+    Text distance_text;
+
     // Update is called once per frame
     void Update()
     {
@@ -47,5 +49,7 @@ public class UIUpdate : MonoBehaviour
         {
             transmit_image.color = Color.gray;
         }
+
+        distance_text.text = $"<color=white>{path_follower.remain_distance:f1}m remain</color>";
     }
 }

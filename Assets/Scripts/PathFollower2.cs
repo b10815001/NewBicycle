@@ -1,3 +1,4 @@
+using RoadArchitect;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class PathFollower2 : MonoBehaviour
 
     public IndoorBike_FTMS_Connector connector;
     public float total_distance = 0;
+    public float remain_distance = 0;
     public float resistance = 0;
     public bool use_resistance = false;
 
@@ -33,6 +35,15 @@ public class PathFollower2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        float step_const = 0.25f;
+        while (!ended)
+        {
+            arclength(step_const);
+            total_distance += step_const;
+        }
+        remain_distance = total_distance;
+        ended = false;
+
         transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
         transform.LookAt(camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node + 1].transform.position, Vector3.up);
     }
@@ -40,21 +51,25 @@ public class PathFollower2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) pause = !pause;
+        if (Input.GetKeyDown(KeyCode.Space))
+            pause = !pause;
     }
 
     void FixedUpdate()
     {
-        if (!pause) arclength();
+        if (!pause)
+        {
+            float next_step = speedTerm *speedFactor * connector.GetSpeed();
+            remain_distance -= next_step;
+            arclength(next_step);
+        }
     }
 
-    private void arclength()
+    private void arclength(float distance)
     {
-        float distance = speedTerm * speedFactor * connector.GetSpeed();
-        total_distance += distance;
         List<RoadArchitect.SplineN> nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
         int next_node = 0;
-
+       
         if (procedural)
         {
             /*
