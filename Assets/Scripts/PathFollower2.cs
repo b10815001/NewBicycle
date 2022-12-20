@@ -32,6 +32,12 @@ public class PathFollower2 : MonoBehaviour
 
     public Text speedTermText;
 
+    float current_height;
+    public int height_data_length = 1280;
+    public float[] height_data;
+    public float[] slope_data;
+    public float height_data_max = 0.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,6 +48,18 @@ public class PathFollower2 : MonoBehaviour
             total_distance += step_const;
         }
         remain_distance = total_distance;
+        ended = false;
+
+        height_data = new float[height_data_length];
+        slope_data = new float[height_data_length];
+        float map_step = total_distance / height_data_length;
+        for (int d = 0; d < height_data_length; d++)
+        {
+            arclength(map_step);
+            height_data[d] = current_height;
+            slope_data[d] = getOutputSlope();
+            height_data_max = Mathf.Max(height_data_max, height_data[d]);
+        }
         ended = false;
 
         transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
@@ -149,6 +167,7 @@ public class PathFollower2 : MonoBehaviour
                         Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
+                        current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
                         slope = current_tangent.y;
                         Quaternion last_rotation = transform.rotation;
@@ -190,6 +209,7 @@ public class PathFollower2 : MonoBehaviour
                         Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
+                        current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
                         slope = current_tangent.y;
                         Quaternion last_rotation = transform.rotation;
@@ -219,6 +239,11 @@ public class PathFollower2 : MonoBehaviour
         //if (slope < 0) return (slope + 0.2f) * 5 * 200;
         //else if (slope == 0) return 200;
         //return (slope * 800 * 5) + 200;
+    }
+
+    public int getHeightNorm(int index)
+    {
+        return Mathf.RoundToInt(height_data[index] * 300 / height_data_max) + 10;
     }
 
     public void setEnd()
