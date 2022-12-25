@@ -10,6 +10,12 @@ public class UIUpdate : MonoBehaviour
     [SerializeField]
     RawImage slope_image;
     [SerializeField]
+    Texture2D slope_image_green;
+    [SerializeField]
+    Texture2D slope_image_yellow;
+    [SerializeField]
+    Texture2D slope_image_blue;
+    [SerializeField]
     Text slope_text;
     [SerializeField]
     PathFollower2 path_follower;
@@ -29,14 +35,19 @@ public class UIUpdate : MonoBehaviour
     Texture2D slope_map;
     Texture2D slope_map_current;
     bool map_initial = false;
+    int margin;
+    int height_data_length;
 
     // Start is called before the first frame update
     void Start()
     {
         slope_map = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
+        slope_map.DrawRect(new RectInt(0, 0, slope_map.width, slope_map.height), new Color(0, 0, 0, 0));
         slope_map_current = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
         slope_map_current.wrapMode = TextureWrapMode.Clamp;
-        slope_map.DrawRect(new RectInt(0, 0, slope_map.width, slope_map.height), new Color(0, 0, 0, 0));
+
+        margin = path_follower.getMargin();
+        height_data_length = path_follower.getHeightDataLength();
     }
 
     // Update is called once per frame
@@ -45,7 +56,7 @@ public class UIUpdate : MonoBehaviour
         if (!map_initial)
         {
             map_initial = true;
-            for (int d = 0; d < path_follower.height_data_length; d++)
+            for (int d = 0; d < height_data_length; d++)
             {
                 int height_normized = path_follower.getHeightNorm(d);
                 Color c;
@@ -61,7 +72,7 @@ public class UIUpdate : MonoBehaviour
                 {
                     c = new Color(255, 255, 0);
                 }
-                slope_map.DrawCircle(new Vector2Int(d + path_follower.margin, height_normized), 5, c);
+                slope_map.DrawCircle(new Vector2Int(d + margin, height_normized), 5, c);
             }
             slope_map.Apply();
             Graphics.CopyTexture(slope_map, slope_map_current);
@@ -72,6 +83,18 @@ public class UIUpdate : MonoBehaviour
 
         float slope = path_follower.getOutputSlope() * 100;
         slope_image.transform.rotation = Quaternion.Euler(0, 0, slope);
+        if (slope < 0.0f)
+        {
+            slope_image.texture = (Texture)slope_image_blue;
+        }
+        else if (slope < 5.0f)
+        {
+            slope_image.texture = (Texture)slope_image_green;
+        }
+        else
+        {
+            slope_image.texture = (Texture)slope_image_yellow;
+        }
         slope_text.text = $"<color=white>{slope:f1}%</color>";
 
         if (ftms_connector.connectorAPI.isSubscribed)
@@ -100,22 +123,14 @@ public class UIUpdate : MonoBehaviour
         distance_text.text = $"<color=white>{path_follower.remain_distance:f1}m\nremaining</color>";
 
         drawSlopeMap();
-        drawPathMap();
+        path_follower.drawCurrentPosMap();
     }
 
     void drawSlopeMap()
     {
-        //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
-        int d = Mathf.RoundToInt((path_follower.total_distance - path_follower.remain_distance) * path_follower.height_data_length / path_follower.total_distance);
-        slope_map_current.DrawFilledCircle(new Vector2Int(path_follower.margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
+        Graphics.CopyTexture(slope_map, slope_map_current); // refresh
+        int d = Mathf.RoundToInt((path_follower.total_distance - path_follower.remain_distance) * height_data_length / path_follower.total_distance);
+        slope_map_current.DrawFilledCircle(new Vector2Int(margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
         slope_map_current.Apply();
-    }
-
-    void drawPathMap()
-    {
-        //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
-        var pos = path_follower.toPathMapCoord(path_follower.transform.position);
-        path_follower.path_map.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.z)), 10, Color.red);
-        path_follower.path_map.Apply();
     }
 }

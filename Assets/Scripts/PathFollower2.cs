@@ -34,8 +34,8 @@ public class PathFollower2 : MonoBehaviour
     public Text speedTermText;
 
     float current_height;
-    public int margin = 5;
-    public int height_data_length = 1270; // 1280 - 2 * margin
+    const int margin = 10;
+    const int height_data_length = 1260; // 1280 - 2 * margin
     public float[] height_data;
     public float[] slope_data;
     public float height_data_max = 0.0f;
@@ -43,8 +43,9 @@ public class PathFollower2 : MonoBehaviour
     public float map_z_max = float.NegativeInfinity;
     public float map_x_min = float.PositiveInfinity;
     public float map_z_min = float.PositiveInfinity;
-    bool draw_map = false;
+    bool find_boundary = false;
     public Texture2D path_map;
+    Vector3 current_pos, current_tangent;
 
     // Start is called before the first frame update
     void Start()
@@ -57,11 +58,11 @@ public class PathFollower2 : MonoBehaviour
         }
         remain_distance = total_distance;
         ended = false;
+        find_boundary = true;
 
         height_data = new float[height_data_length];
         slope_data = new float[height_data_length];
         float map_step = total_distance / height_data_length;
-        draw_map = true;
         path_map = new Texture2D(320, 320, TextureFormat.ARGB32, false);
         path_map.wrapMode = TextureWrapMode.Clamp;
         path_map.DrawRect(new RectInt(0, 0, path_map.width, path_map.height), new Color(0, 0, 0, 0));
@@ -71,8 +72,8 @@ public class PathFollower2 : MonoBehaviour
             height_data[d] = current_height;
             slope_data[d] = getOutputSlope();
             height_data_max = Mathf.Max(height_data_max, height_data[d]);
+            initPathMap();
         }
-        draw_map = false;
         path_map.Apply();
         ended = false;
 
@@ -178,11 +179,9 @@ public class PathFollower2 : MonoBehaviour
                     if (distance == 0)
                     {
                         Vector3 linear_pos = nodes[current_node].pos + (nodes[next_node].pos - nodes[current_node].pos).normalized * covered_distance;
-                        Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
-                        updateBoundary(current_pos);
-                        drawMap(current_pos);
+                        updateBoundary();
                         current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
                         slope = current_tangent.y;
@@ -222,14 +221,12 @@ public class PathFollower2 : MonoBehaviour
                     if (distance == 0)
                     {
                         Vector3 linear_pos = nodes[current_node].pos + (nodes[next_node].pos - nodes[current_node].pos).normalized * covered_distance;
-                        Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
-                        updateBoundary(current_pos);
-                        drawMap(current_pos);
+                        updateBoundary();
                         current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
-                        slope = current_tangent.y;
+                        slope = -current_tangent.y; // not straight
                         Quaternion last_rotation = transform.rotation;
 
                         int next_next_node = (next_node - 1 > 0) ? (next_node - 1) : 0;
@@ -280,9 +277,19 @@ public class PathFollower2 : MonoBehaviour
         speedTermText.text = "Speed Multiplier: " + speedTerm.ToString("0.00");
     }
 
-    void updateBoundary(Vector3 current_pos)
+    public int getMargin()
     {
-        if (draw_map)
+        return margin;
+    }
+
+    public int getHeightDataLength()
+    {
+        return height_data_length;
+    }    
+
+    void updateBoundary()
+    {
+        if (find_boundary)
             return;
 
         map_x_max = Mathf.Max(map_x_max, current_pos.x);
@@ -291,7 +298,7 @@ public class PathFollower2 : MonoBehaviour
         map_z_min = Mathf.Min(map_z_min, current_pos.z);
     }
 
-    public (float x, float z) toPathMapCoord(Vector3 current_pos)
+    public (float x, float z) toPathMapCoord(Vector3 pos)
     {
         float offset_x = 0.0f, offset_z = 0.0f, norm_size;
         if (map_x_max - map_x_min > map_z_max - map_z_min)
@@ -305,18 +312,22 @@ public class PathFollower2 : MonoBehaviour
             norm_size = map_z_max - map_z_min;
             offset_x = ((path_map.width - 2 * margin) - (map_x_max - map_x_min) / norm_size * (path_map.width - 2 * margin)) / 2;
         }
-        float x = (current_pos.x - map_x_min) * (path_map.width - 2 * margin) / norm_size + margin + offset_x;
-        float z = (current_pos.z - map_z_min) * (path_map.height - 2 * margin) / norm_size + margin + offset_z;
+        float x = (pos.x - map_x_min) * (path_map.width - 2 * margin) / norm_size + margin + offset_x;
+        float z = (pos.z - map_z_min) * (path_map.height - 2 * margin) / norm_size + margin + offset_z;
 
         return (x, z);
     }
 
-    void drawMap(Vector3 current_pos)
+    void initPathMap()
     {
-        if (!draw_map)
-            return;
-
         var coord = toPathMapCoord(current_pos);
         path_map.DrawCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 5, Color.grey);
+    }
+
+    public void drawCurrentPosMap()
+    {
+        var coord = toPathMapCoord(current_pos);
+        path_map.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 6, Color.red);
+        path_map.Apply();
     }
 }
