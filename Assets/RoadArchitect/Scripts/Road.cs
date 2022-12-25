@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using RoadArchitect;
+using static UnityEngine.GraphicsBuffer;
 #endregion
 
 
@@ -1975,6 +1976,11 @@ namespace RoadArchitect
         public void getPosAndTangent(Vector3 target, out Vector3 pos, out Vector3 tangent)
         {
             spline.GetSplineValueBoth(spline.GetClosestParam(target, false, false), out pos, out tangent);
+        }
+
+        public void getPosAndTangent(float t, out Vector3 pos, out Vector3 tangent)
+        {
+            spline.GetSplineValueBoth(t, out pos, out tangent);
         }
     }
 }

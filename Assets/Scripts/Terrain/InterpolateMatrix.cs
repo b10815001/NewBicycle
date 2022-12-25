@@ -9,11 +9,20 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
+using Antlr4.Runtime.Tree;
 
 [ExecuteInEditMode]
 public class InterpolateMatrix : MonoBehaviour
 {
 #if UNITY_EDITOR
+    [SerializeField]
+    List<Road> roads = new();
+    [SerializeField]
+    List<int> start = new();
+    [SerializeField]
+    List<int> end = new();
+
     [SerializeField]
     GameObject road_architect;
     [SerializeField]
@@ -290,7 +299,10 @@ public class InterpolateMatrix : MonoBehaviour
             do_constraint = false;
 
             //terrains = new Terrain[] { terrain };
-            doRoadConstraint(2, ref terrains);
+            for (int road_index = 0; road_index < roads.Count; road_index++)
+            {
+                doRoadConstraint(roads[road_index], ref terrains, start[road_index], end[road_index]);
+            }
         }
 
         if (consistency)
@@ -313,25 +325,28 @@ public class InterpolateMatrix : MonoBehaviour
         }
     }
 
-    void doRoadConstraint(int road_index, ref Terrain[] terrains)
+    void doRoadConstraint(Road road, ref Terrain[] terrains, int start_node, int end_node)
     {
-        if (road_architect.transform.GetChild(2).gameObject.TryGetComponent<Road>(out road))
+        float t_start = road.spline.GetClosestParam(road.spline.nodes[start_node].pos, false, false);
+        float t_end = road.spline.GetClosestParam(road.spline.nodes[end_node].pos, false, false);
+        for (int terrain_index = 0; terrain_index < terrains.Length; terrain_index++)
         {
-            for (int terrain_index = 0; terrain_index < terrains.Length; terrain_index++)
+            terrain = terrains[terrain_index];
+
+            float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
+
+            for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
             {
-                terrain = terrains[terrain_index];
-
-                float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
-
-                for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
+                for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
                 {
-                    for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
+                    Vector2 pos2d = Utils.getWorldPos(terrain, i, j);
+                    Vector3 pos = new Vector3(pos2d.x, 0, pos2d.y);
+                    pos.y = terrain.SampleHeight(pos) + terrain.transform.position.y;
+                    Vector3 nearest_point, nearest_tangent;
+                    float t = road.spline.GetClosestParam(pos, false, false);
+                    if ((t > t_start && t < t_end) || (t > t_end && t < t_start))
                     {
-                        Vector2 pos2d = Utils.getWorldPos(terrain, i, j);
-                        Vector3 pos = new Vector3(pos2d.x, 0, pos2d.y);
-                        pos.y = terrain.SampleHeight(pos) + terrain.transform.position.y;
-                        Vector3 nearest_point, nearest_tangent;
-                        road.getPosAndTangent(pos, out nearest_point, out nearest_tangent);
+                        road.getPosAndTangent(t, out nearest_point, out nearest_tangent);
                         float distance = Vector2.Distance(new Vector2(nearest_point.x, nearest_point.z), pos2d);
                         float road_height = nearest_point.y - 0.5f;
                         if (distance < road.laneWidth + road.shoulderWidth + boundary_width) // in road
@@ -346,12 +361,8 @@ public class InterpolateMatrix : MonoBehaviour
                         }
                     }
                 }
-                terrain.terrainData.SetHeights(0, 0, constraint_kernel);
             }
-        }
-        else
-        {
-            Debug.LogError("Road.cs not be loaded");
+            terrain.terrainData.SetHeights(0, 0, constraint_kernel);
         }
     }
 #endif
