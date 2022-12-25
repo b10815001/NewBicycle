@@ -2,15 +2,20 @@ using ProceduralToolkit;
 using RoadArchitect;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PathFollower2 : MonoBehaviour
 {
+    public List<Road> road_list = new();
+    public List<RoadIntersection> intersection_list = new();
     public List<GameObject> roads = new();
     public List<int> start = new();
     public List<int> end = new();
     public List<bool> straight = new();
+    public float view_size = 100;
+    public GameObject view = null;
 
     private int current_road = 0;
     private int current_node = 0;
@@ -50,6 +55,7 @@ public class PathFollower2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        view.transform.localScale = new Vector3(view_size, 1, view_size) * 2;
         float step_const = 0.25f;
         while (!ended)
         {
@@ -95,6 +101,32 @@ public class PathFollower2 : MonoBehaviour
             float next_step = speedTerm *speedFactor * connector.GetSpeed();
             remain_distance -= next_step;
             arclength(next_step);
+
+            renderView();
+        }
+    }
+
+    void renderView()
+    {
+        for (int id = 0; id < road_list.Count; id++)
+        {
+            Vector3 compare = road_list[id].spline.GetSplineValue(road_list[id].spline.GetClosestParam(transform.position, false, false));
+            
+            if ((transform.position - compare).magnitude < view_size)
+            {
+                road_list[id].gameObject.SetActive(true);
+            }
+            else road_list[id].gameObject.SetActive(false);
+        }
+        for (int id = 0; id < intersection_list.Count; id++)
+        {
+            Vector3 compare = intersection_list[id].gameObject.transform.position;
+
+            if ((transform.position - compare).magnitude < view_size)
+            {
+                intersection_list[id].gameObject.SetActive(true);
+            }
+            else intersection_list[id].gameObject.SetActive(false);
         }
     }
 
