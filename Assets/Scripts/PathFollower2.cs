@@ -1,3 +1,4 @@
+using ProceduralToolkit;
 using RoadArchitect;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,10 +34,17 @@ public class PathFollower2 : MonoBehaviour
     public Text speedTermText;
 
     float current_height;
-    public int height_data_length = 1280;
+    public int margin = 5;
+    public int height_data_length = 1270; // 1280 - 2 * margin
     public float[] height_data;
     public float[] slope_data;
     public float height_data_max = 0.0f;
+    public float map_x_max = float.NegativeInfinity;
+    public float map_z_max = float.NegativeInfinity;
+    public float map_x_min = float.PositiveInfinity;
+    public float map_z_min = float.PositiveInfinity;
+    bool draw_map = false;
+    public Texture2D path_map;
 
     // Start is called before the first frame update
     void Start()
@@ -53,6 +61,10 @@ public class PathFollower2 : MonoBehaviour
         height_data = new float[height_data_length];
         slope_data = new float[height_data_length];
         float map_step = total_distance / height_data_length;
+        draw_map = true;
+        path_map = new Texture2D(320, 320, TextureFormat.ARGB32, false);
+        path_map.wrapMode = TextureWrapMode.Clamp;
+        path_map.DrawRect(new RectInt(0, 0, path_map.width, path_map.height), new Color(0, 0, 0, 0));
         for (int d = 0; d < height_data_length; d++)
         {
             arclength(map_step);
@@ -60,6 +72,8 @@ public class PathFollower2 : MonoBehaviour
             slope_data[d] = getOutputSlope();
             height_data_max = Mathf.Max(height_data_max, height_data[d]);
         }
+        draw_map = false;
+        path_map.Apply();
         ended = false;
 
         transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
@@ -167,6 +181,8 @@ public class PathFollower2 : MonoBehaviour
                         Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
+                        updateBoundary(current_pos);
+                        drawMap(current_pos);
                         current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
                         slope = current_tangent.y;
@@ -209,6 +225,8 @@ public class PathFollower2 : MonoBehaviour
                         Vector3 current_pos, current_tangent;
                         roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetSplineValueBoth(roads[current_road].GetComponent<RoadArchitect.Road>().spline.GetClosestParam(linear_pos, false, false), out current_pos, out current_tangent);
                         transform.position = camera_height + current_pos;
+                        updateBoundary(current_pos);
+                        drawMap(current_pos);
                         current_height = current_pos.y;
                         current_tangent = current_tangent.normalized;
                         slope = current_tangent.y;
@@ -260,5 +278,45 @@ public class PathFollower2 : MonoBehaviour
     {
         speedTerm = _speedTerm;
         speedTermText.text = "Speed Multiplier: " + speedTerm.ToString("0.00");
+    }
+
+    void updateBoundary(Vector3 current_pos)
+    {
+        if (draw_map)
+            return;
+
+        map_x_max = Mathf.Max(map_x_max, current_pos.x);
+        map_z_max = Mathf.Max(map_z_max, current_pos.z);
+        map_x_min = Mathf.Min(map_x_min, current_pos.x);
+        map_z_min = Mathf.Min(map_z_min, current_pos.z);
+    }
+
+    public (float x, float z) toPathMapCoord(Vector3 current_pos)
+    {
+        float offset_x = 0.0f, offset_z = 0.0f, norm_size;
+        if (map_x_max - map_x_min > map_z_max - map_z_min)
+        {
+            norm_size = map_x_max - map_x_min;
+            //f = map_x_max - map_x_min : map_z_max - map_z_min = 1 : x
+            offset_z = ((path_map.height - 2 * margin) - (map_z_max - map_z_min) / norm_size * (path_map.height - 2 * margin)) / 2;
+        }
+        else
+        {
+            norm_size = map_z_max - map_z_min;
+            offset_x = ((path_map.width - 2 * margin) - (map_x_max - map_x_min) / norm_size * (path_map.width - 2 * margin)) / 2;
+        }
+        float x = (current_pos.x - map_x_min) * (path_map.width - 2 * margin) / norm_size + margin + offset_x;
+        float z = (current_pos.z - map_z_min) * (path_map.height - 2 * margin) / norm_size + margin + offset_z;
+
+        return (x, z);
+    }
+
+    void drawMap(Vector3 current_pos)
+    {
+        if (!draw_map)
+            return;
+
+        var coord = toPathMapCoord(current_pos);
+        path_map.DrawCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 5, Color.grey);
     }
 }

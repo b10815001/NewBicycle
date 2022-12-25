@@ -23,6 +23,8 @@ public class UIUpdate : MonoBehaviour
     Text distance_text;
     [SerializeField]
     RawImage slope_map_gui;
+    [SerializeField]
+    RawImage path_map_gui;
 
     Texture2D slope_map;
     Texture2D slope_map_current;
@@ -34,6 +36,7 @@ public class UIUpdate : MonoBehaviour
         slope_map = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
         slope_map_current = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
         slope_map_current.wrapMode = TextureWrapMode.Clamp;
+        slope_map.DrawRect(new RectInt(0, 0, slope_map.width, slope_map.height), new Color(0, 0, 0, 0));
     }
 
     // Update is called once per frame
@@ -58,11 +61,13 @@ public class UIUpdate : MonoBehaviour
                 {
                     c = new Color(255, 255, 0);
                 }
-                slope_map.DrawCircle(new Vector2Int(d, height_normized), 5, c);
+                slope_map.DrawCircle(new Vector2Int(d + path_follower.margin, height_normized), 5, c);
             }
             slope_map.Apply();
             Graphics.CopyTexture(slope_map, slope_map_current);
             slope_map_gui.texture = (Texture)slope_map_current;
+
+            path_map_gui.texture = (Texture)path_follower.path_map;
         }
 
         float slope = path_follower.getOutputSlope() * 100;
@@ -92,16 +97,25 @@ public class UIUpdate : MonoBehaviour
             transmit_image.color = Color.gray;
         }
 
-        distance_text.text = $"<color=white>{path_follower.remain_distance:f1}m remaining</color>";
+        distance_text.text = $"<color=white>{path_follower.remain_distance:f1}m\nremaining</color>";
 
         drawSlopeMap();
+        drawPathMap();
     }
 
     void drawSlopeMap()
     {
         //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
         int d = Mathf.RoundToInt((path_follower.total_distance - path_follower.remain_distance) * path_follower.height_data_length / path_follower.total_distance);
-        slope_map_current.DrawCircle(new Vector2Int(d, path_follower.getHeightNorm(d)), 10, Color.red);
+        slope_map_current.DrawFilledCircle(new Vector2Int(path_follower.margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
         slope_map_current.Apply();
+    }
+
+    void drawPathMap()
+    {
+        //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
+        var pos = path_follower.toPathMapCoord(path_follower.transform.position);
+        path_follower.path_map.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.z)), 10, Color.red);
+        path_follower.path_map.Apply();
     }
 }
