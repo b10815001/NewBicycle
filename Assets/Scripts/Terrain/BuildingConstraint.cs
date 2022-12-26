@@ -6,7 +6,6 @@ using UnityEngine;
 public class BuildingConstraint : MonoBehaviour
 {
     [SerializeField]
-    GameObject bg_start_creator_gameobject;
     bgStartCreator bg_start_creator;
     GameObject building;
     bool is_initial = false;
@@ -17,19 +16,7 @@ public class BuildingConstraint : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (do_constraint && bg_start_creator_gameobject == null)
-        {
-            Debug.LogWarning("Warning! bg_start_creator not be loaded!");
-        }
-        else
-        {
-            if (bg_start_creator_gameobject.TryGetComponent<bgStartCreator>(out bg_start_creator))
-            {
-                Debug.Log($"bgStartCreator.cs are loaded");
-            }
-
-            is_initial = true;
-        }
+        is_initial = true;
         terrain = GetComponent<Terrain>();
     }
 

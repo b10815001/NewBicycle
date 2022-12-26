@@ -11,6 +11,7 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 using Antlr4.Runtime.Tree;
+using UnityEditor.Build;
 
 [ExecuteInEditMode]
 public class InterpolateMatrix : MonoBehaviour
@@ -25,6 +26,10 @@ public class InterpolateMatrix : MonoBehaviour
 
     [SerializeField]
     GameObject road_architect;
+    [SerializeField]
+    bgStartCreator bg_start_creator;
+    [SerializeField]
+    GameObject[] building_anchor;
     [SerializeField]
     bool get_road_constraint = false;
     [SerializeField]
@@ -303,6 +308,12 @@ public class InterpolateMatrix : MonoBehaviour
             {
                 doRoadConstraint(roads[road_index], ref terrains, start[road_index], end[road_index]);
             }
+
+            doBuildingConstaint(bg_start_creator.buildingPolygonList.ToArray(), bg_start_creator.buildingTransformList.ToArray(), debug); //new Vector3(602.4f, 38.8f, 104.3f)
+            //for (int building_index = 0; building_index < bg_start_creator.buildingPolygonList.Count; building_index++)
+            //{
+            //    doBuildingConstaint(bg_start_creator.buildingPolygonList[building_index].points, building_anchor[building_index].transform.position); //new Vector3(602.4f, 38.8f, 104.3f)
+            //}
         }
 
         if (consistency)
@@ -327,8 +338,8 @@ public class InterpolateMatrix : MonoBehaviour
 
     void doRoadConstraint(Road road, ref Terrain[] terrains, int start_node, int end_node)
     {
-        float t_start = road.spline.GetClosestParam(road.spline.nodes[start_node].pos, false, false);
-        float t_end = road.spline.GetClosestParam(road.spline.nodes[end_node].pos, false, false);
+        //float t_start = road.spline.GetClosestParam(road.spline.nodes[start_node].pos, false, false);
+        //float t_end = road.spline.GetClosestParam(road.spline.nodes[end_node].pos, false, false);
         for (int terrain_index = 0; terrain_index < terrains.Length; terrain_index++)
         {
             terrain = terrains[terrain_index];
@@ -344,7 +355,7 @@ public class InterpolateMatrix : MonoBehaviour
                     pos.y = terrain.SampleHeight(pos) + terrain.transform.position.y;
                     Vector3 nearest_point, nearest_tangent;
                     float t = road.spline.GetClosestParam(pos, false, false);
-                    if ((t > t_start && t < t_end) || (t > t_end && t < t_start))
+                    //if ((t > t_start && t < t_end) || (t > t_end && t < t_start))
                     {
                         road.getPosAndTangent(t, out nearest_point, out nearest_tangent);
                         float distance = Vector2.Distance(new Vector2(nearest_point.x, nearest_point.z), pos2d);
@@ -364,6 +375,110 @@ public class InterpolateMatrix : MonoBehaviour
             }
             terrain.terrainData.SetHeights(0, 0, constraint_kernel);
         }
+    }
+
+    void doBuildingConstaint(bgPolygonAsset[] polygons, Transform[] biass, bool debug = false)
+    {
+        //int x_base = int.MaxValue;
+        //int y_base = int.MaxValue;
+        //int x_boundary = int.MinValue;
+        //int y_boundary = int.MinValue;
+        //Vector2[] building_polygon = new Vector2[polygons.Length];
+        //for (int point_index = 0; point_index < polygons.Length; point_index++)
+        //{
+        //    var terrain_data_pos = Utils.getTerrainDataPos(terrain, polygons[point_index].points);
+        //    building_polygon[point_index] = new Vector2(terrain_data_pos.x, terrain_data_pos.y);
+        //    if (terrain_data_pos.x < x_base)
+        //    {
+        //        x_base = terrain_data_pos.x;
+        //    }
+        //    if (terrain_data_pos.x > x_boundary)
+        //    {
+        //        x_boundary = terrain_data_pos.x;
+        //    }
+        //    if (terrain_data_pos.y < y_base)
+        //    {
+        //        y_base = terrain_data_pos.y;
+        //    }
+        //    if (terrain_data_pos.y > y_boundary)
+        //    {
+        //        y_boundary = terrain_data_pos.y;
+        //    }
+        //    if (debug)
+        //    {
+        //        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //        cube.name = $"{terrain_data_pos.x} {terrain_data_pos.y}";
+        //        cube.transform.position = polygon_pos;
+        //    }
+        //}
+
+        //int height_x_size = x_boundary - x_base + 1;
+        //int height_y_size = y_boundary - y_base + 1;
+        //float[,] constraint_kernel = terrain.terrainData.GetHeights(x_base, y_base, height_x_size, height_y_size);
+        float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
+
+        //// display points of the polygon
+        //if (debug)
+        //{
+        //    for (int point_index = 0; point_index < building_polygon.Length - 1; point_index++)
+        //    {
+        //        constraint_kernel[Mathf.RoundToInt(building_polygon[point_index].y - y_base), Mathf.RoundToInt(building_polygon[point_index].x - x_base)] = biass.y / terrain.terrainData.size.y;
+        //    }
+        //}
+        Vector2[][] polygons2d = new Vector2[polygons.Length][];
+        for (int building_index = 0; building_index < polygons.Length; building_index++)
+        {
+            if (polygons[building_index] == null || biass[building_index] == null)
+                continue;
+
+            polygons2d[building_index] = new Vector2[polygons[building_index].points.Length];
+            for (int point_index = 0; point_index < polygons[building_index].points.Length; point_index++)
+            {
+                polygons2d[building_index][point_index] = new Vector2(polygons[building_index].points[point_index].x * bg_start_creator.polygonCoordScale + biass[building_index].position.x, polygons[building_index].points[point_index].z * bg_start_creator.polygonCoordScale + biass[building_index].position.z);
+            }
+        }
+
+        Vector2[] terrain_data_poss = new Vector2[terrain.terrainData.heightmapResolution * terrain.terrainData.heightmapResolution];
+        int[] belong_building_indexs = new int[terrain.terrainData.heightmapResolution * terrain.terrainData.heightmapResolution];
+        for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
+        {
+            for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
+            {
+                terrain_data_poss[j * terrain.terrainData.heightmapResolution + i] = Utils.getWorldPos(terrain, i, j);
+                belong_building_indexs[j * terrain.terrainData.heightmapResolution + i] = -1;
+                for (int building_index = 0; building_index < polygons.Length; building_index++)
+                {
+                    if (polygons[building_index] == null || biass[building_index] == null)
+                        continue;
+
+                    if (Utils.pointInPolygon(polygons2d[building_index], terrain_data_poss[j * terrain.terrainData.heightmapResolution + i]))
+                    {
+                        belong_building_indexs[j * terrain.terrainData.heightmapResolution + i] = building_index;
+                        break;
+                    }
+                }
+            }
+        }
+
+        int[] offset_x = new int[] { 0, 0, 0, -1, 1 };
+        int[] offset_z = new int[] { 0, -1, 1, 0, 0 };
+        for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
+        {
+            for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
+            {
+                for (int k = 0; k < offset_x.Length; k++)
+                {
+                    int u = i + offset_x[k];
+                    int v = j + offset_z[k];
+                    if (u > -1 && u < terrain.terrainData.heightmapResolution && v > -1 && v < terrain.terrainData.heightmapResolution && belong_building_indexs[v * terrain.terrainData.heightmapResolution + u] != -1)
+                    {
+                        constraint_kernel[j, i] = biass[belong_building_indexs[v * terrain.terrainData.heightmapResolution + u]].position.y / terrain.terrainData.size.y;
+                        break;
+                    }
+                }
+            }
+        }
+        terrain.terrainData.SetHeights(0, 0, constraint_kernel);
     }
 #endif
 }

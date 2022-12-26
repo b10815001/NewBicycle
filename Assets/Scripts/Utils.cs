@@ -65,9 +65,14 @@ public static class Utils
         Vector2[] coords = new Vector2[length];
         for (int i = 0; i < length; i++)
         {
-            coords[i] = new Vector2(points[i].x, points[i].z);
+            coords[i] = toVec2(points[i]);
         }
         return coords;
+    }
+
+    public static Vector2 toVec2(Vector3 point)
+    {
+        return new Vector2(point.x, point.z);
     }
 
     //***********************************************************************
@@ -145,6 +150,11 @@ public static class Utils
         //    j = i;
         //}
         return result;
+    }
+
+    static public bool pointInPolygon(Vector3[] polygon, Vector2 p)
+    {
+        return pointInPolygon(toVec2(polygon), p);
     }
 
     static public bool pointInPolygon(Vector2[] polygon, Vector2 p)
