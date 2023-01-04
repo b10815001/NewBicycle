@@ -46,11 +46,6 @@ public class UIUpdate : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!ftms_connector.IsConnected())
-        {
-            bluetooth_gui.SetActive(true);
-        }
-
         slope_map = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
         slope_map.DrawRect(new RectInt(0, 0, slope_map.width, slope_map.height), new Color(0, 0, 0, 0));
         slope_map_current = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
@@ -66,6 +61,11 @@ public class UIUpdate : MonoBehaviour
         if (!map_initial)
         {
             map_initial = true;
+            if (!ftms_connector.IsConnected())
+            {
+                bluetooth_gui.SetActive(true);
+            }
+
             for (int d = 0; d < height_data_length; d++)
             {
                 int height_normized = path_follower.getHeightNorm(d);
@@ -88,7 +88,7 @@ public class UIUpdate : MonoBehaviour
             Graphics.CopyTexture(slope_map, slope_map_current);
             slope_map_gui.texture = (Texture)slope_map_current;
 
-            path_map_gui.texture = (Texture)path_follower.path_map;
+            path_map_gui.texture = (Texture)path_follower.path_map_current;
         }
 
         float slope = path_follower.getOutputSlope() * 100;
@@ -145,12 +145,14 @@ public class UIUpdate : MonoBehaviour
     void drawSlopeMap()
     {
         //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
+        if (path_follower.remain_distance < 0)
+            path_follower.remain_distance = 0;
         int d = Mathf.RoundToInt((path_follower.total_distance - path_follower.remain_distance) * height_data_length / path_follower.total_distance);
         //slope_map_current.DrawFilledCircle(new Vector2Int(margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
         //slope_map_current.Apply();
 
         float slope = path_follower.getOutputSlope() * 100;
-        arrow.transform.rotation = Quaternion.Euler(0, 0, slope);
+        arrow.transform.rotation = Quaternion.Euler(0, 0, slope * 2);
         arrow.transform.position = slope_map_gui.transform.position - new Vector3(slope_map_gui.rectTransform.rect.width / 2, slope_map_gui.rectTransform.rect.height / 2, 0) + new Vector3(margin + d, path_follower.getHeightNorm(d), 0) / 5.0f;
     }
 }

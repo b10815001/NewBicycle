@@ -48,8 +48,10 @@ public class PathFollower2 : MonoBehaviour
     public float map_z_max = float.NegativeInfinity;
     public float map_x_min = float.PositiveInfinity;
     public float map_z_min = float.PositiveInfinity;
+    bool refresh_map = false;
     bool find_boundary = false;
-    public Texture2D path_map;
+    Texture2D path_map;
+    public Texture2D path_map_current;
     Vector3 current_pos, current_tangent;
 
     // Start is called before the first frame update
@@ -81,6 +83,10 @@ public class PathFollower2 : MonoBehaviour
             initPathMap();
         }
         path_map.Apply();
+        path_map_current = new Texture2D(320, 320, TextureFormat.ARGB32, false);
+        path_map_current.wrapMode = TextureWrapMode.Clamp;
+        path_map_current.DrawRect(new RectInt(0, 0, path_map_current.width, path_map_current.height), new Color(0, 0, 0, 0));
+        Graphics.CopyTexture(path_map, path_map_current); // refresh
         ended = false;
 
         transform.position = camera_height + roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes[current_node].transform.position;
@@ -205,7 +211,10 @@ public class PathFollower2 : MonoBehaviour
                         if (next_node == end[current_road])
                         {
                             current_road = (current_road + 1) % roads.Count;
-                            if (current_road == 0) ended = true;
+                            if (current_road == 0)
+                            {
+                                setEnd();
+                            }
                             current_node = start[current_road];
                             nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
                         }
@@ -247,7 +256,10 @@ public class PathFollower2 : MonoBehaviour
                         if (next_node == end[current_road])
                         {
                             current_road = (current_road + 1) % roads.Count;
-                            if (current_road == 0) ended = true;
+                            if (current_road == 0)
+                            {
+                                setEnd();
+                            }
                             current_node = start[current_road];
                             nodes = roads[current_road].GetComponent<RoadArchitect.Road>().spline.nodes;
                         }
@@ -299,12 +311,15 @@ public class PathFollower2 : MonoBehaviour
 
     public int getHeightNorm(int index)
     {
+        index = Mathf.Min(index, height_data.Length - 1);
         return Mathf.RoundToInt(height_data[index] * 300 / height_data_max) + 10;
     }
 
     public void setEnd()
     {
         ended = true;
+        refresh_map = true;
+        remain_distance = total_distance;
     }
 
     public void CloseGame()
@@ -367,8 +382,13 @@ public class PathFollower2 : MonoBehaviour
 
     public void drawCurrentPosMap()
     {
+        if (refresh_map)
+        {
+            refresh_map = false;
+            Graphics.CopyTexture(path_map, path_map_current); // refresh
+        }
         var coord = toPathMapCoord(current_pos);
-        path_map.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 6, Color.red);
-        path_map.Apply();
+        path_map_current.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 6, Color.red);
+        path_map_current.Apply();
     }
 }
