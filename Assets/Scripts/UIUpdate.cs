@@ -33,16 +33,24 @@ public class UIUpdate : MonoBehaviour
     RawImage path_map_gui;
     [SerializeField]
     RawImage arrow;
+    [SerializeField]
+    GameObject bluetooth_gui;
 
     Texture2D slope_map;
     Texture2D slope_map_current;
     bool map_initial = false;
     int margin;
     int height_data_length;
+    bool bluetooth_connected = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        if (!ftms_connector.IsConnected())
+        {
+            bluetooth_gui.SetActive(true);
+        }
+
         slope_map = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
         slope_map.DrawRect(new RectInt(0, 0, slope_map.width, slope_map.height), new Color(0, 0, 0, 0));
         slope_map_current = new Texture2D(1280, 320, TextureFormat.ARGB32, false);
@@ -126,6 +134,12 @@ public class UIUpdate : MonoBehaviour
 
         drawSlopeMap();
         path_follower.drawCurrentPosMap();
+
+        if (!bluetooth_connected && ftms_connector.IsConnected())
+        {
+            bluetooth_connected = true;
+            bluetooth_gui.SetActive(false);
+        }
     }
 
     void drawSlopeMap()
