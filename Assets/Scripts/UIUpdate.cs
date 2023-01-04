@@ -31,6 +31,8 @@ public class UIUpdate : MonoBehaviour
     RawImage slope_map_gui;
     [SerializeField]
     RawImage path_map_gui;
+    [SerializeField]
+    RawImage arrow;
 
     Texture2D slope_map;
     Texture2D slope_map_current;
@@ -128,9 +130,13 @@ public class UIUpdate : MonoBehaviour
 
     void drawSlopeMap()
     {
-        Graphics.CopyTexture(slope_map, slope_map_current); // refresh
+        //Graphics.CopyTexture(slope_map, slope_map_current); // refresh
         int d = Mathf.RoundToInt((path_follower.total_distance - path_follower.remain_distance) * height_data_length / path_follower.total_distance);
-        slope_map_current.DrawFilledCircle(new Vector2Int(margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
-        slope_map_current.Apply();
+        //slope_map_current.DrawFilledCircle(new Vector2Int(margin + d, path_follower.getHeightNorm(d)), 10, Color.red);
+        //slope_map_current.Apply();
+
+        float slope = path_follower.getOutputSlope() * 100;
+        arrow.transform.rotation = Quaternion.Euler(0, 0, slope);
+        arrow.transform.position = slope_map_gui.transform.position - new Vector3(slope_map_gui.rectTransform.rect.width / 2, slope_map_gui.rectTransform.rect.height / 2, 0) + new Vector3(margin + d, path_follower.getHeightNorm(d), 0) / 5.0f;
     }
 }

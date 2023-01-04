@@ -303,6 +303,8 @@ public class InterpolateMatrix : MonoBehaviour
         {
             do_constraint = false;
 
+            roads[1].spline.BridgeParams = new List<KeyValuePair<float, float>>();
+            roads[1].spline.BridgeParams.Add(new KeyValuePair<float, float>(roads[1].spline.GetClosestParam(roads[1].spline.nodes[19].pos), roads[1].spline.GetClosestParam(roads[1].spline.nodes[21].pos)));
             //terrains = new Terrain[] { terrain };
             for (int road_index = 0; road_index < roads.Count; road_index++)
             {
@@ -346,6 +348,11 @@ public class InterpolateMatrix : MonoBehaviour
 
             float[,] constraint_kernel = terrain.terrainData.GetHeights(0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
 
+            //for (int i = 0; i < road.spline.nodes.Count; i++) // 19 21
+            //{
+            //    Debug.Log($"{i} {road.spline.nodes[i].isBridgeMatched}");
+            //}
+
             for (int i = 0; i < terrain.terrainData.heightmapResolution; i++)
             {
                 for (int j = 0; j < terrain.terrainData.heightmapResolution; j++)
@@ -355,6 +362,9 @@ public class InterpolateMatrix : MonoBehaviour
                     pos.y = terrain.SampleHeight(pos) + terrain.transform.position.y;
                     Vector3 nearest_point, nearest_tangent;
                     float t = road.spline.GetClosestParam(pos, false, false);
+                    if (road.spline.IsInBridge(t))
+                        continue;
+
                     //if ((t > t_start && t < t_end) || (t > t_end && t < t_start))
                     {
                         road.getPosAndTangent(t, out nearest_point, out nearest_tangent);
