@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor.Search;
+using UnityEditor.Build;
 #endif
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
@@ -11,7 +12,6 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 using Antlr4.Runtime.Tree;
-using UnityEditor.Build;
 
 [ExecuteInEditMode]
 public class InterpolateMatrix : MonoBehaviour
