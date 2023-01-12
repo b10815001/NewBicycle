@@ -14,8 +14,8 @@ public class PathFollower2 : MonoBehaviour
     public List<int> start = new();
     public List<int> end = new();
     public List<bool> straight = new();
-    public float view_size = 100;
-    public float view_buffer = 100;
+    public float view_size = 200;
+    public float view_buffer = 40;
     public GameObject view = null;
 
     private int current_road = 0;
@@ -125,21 +125,35 @@ public class PathFollower2 : MonoBehaviour
     {
         for (int id = 0; id < road_list.Count; id++)
         {
-            bool state = inRange(road_list[id].spline.GetSplineValue(road_list[id].spline.GetClosestParam(transform.position, false, false)));
-            road_list[id].gameObject.SetActive(state);
+            Vector3 compare = road_list[id].spline.GetSplineValue(road_list[id].spline.GetClosestParam(transform.position, false, false));
+            int state = 0;
+            if (isLeft(transform.position - Vector3.Cross(transform.rotation.eulerAngles, Vector3.up), transform.position + Vector3.Cross(transform.rotation.eulerAngles, Vector3.up), compare)
+                && (transform.position - compare).magnitude > 30) state = 2;
+            else if ((transform.position - compare).magnitude > view_size + view_buffer) state = 2;
+            else if ((transform.position - compare).magnitude < view_size) state = 1;
+            if (state != 0)
+            {
+                road_list[id].gameObject.SetActive((state == 1) ? true : false);
+            }
         }
         for (int id = 0; id < intersection_list.Count; id++)
         {
-            bool state = inRange(intersection_list[id].gameObject.transform.position);
-            intersection_list[id].gameObject.SetActive(state);
+            Vector3 compare = intersection_list[id].gameObject.transform.position;
+            int state = 0;
+            if (isLeft(transform.position - Vector3.Cross(transform.rotation.eulerAngles, Vector3.up), transform.position + Vector3.Cross(transform.rotation.eulerAngles, Vector3.up), compare) 
+                && (transform.position - compare).magnitude > 30) state = 2;
+            else if ((transform.position - compare).magnitude > view_size + view_buffer) state = 2;
+            else if ((transform.position - compare).magnitude < view_size) state = 1;
+            if (state != 0)
+            {
+                intersection_list[id].gameObject.SetActive((state == 1) ? true : false);
+            }
         }
     }
 
-    bool inRange(Vector3 compare)
+    public bool isLeft(Vector3 a, Vector3 b, Vector3 c)
     {
-        if ((transform.position - compare).magnitude < view_size) return true;
-        else if ((transform.position - compare).magnitude > view_size + view_buffer) return false;
-        return true;
+        return ((b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x)) > 0;
     }
 
     private void arclength(float distance, float speed = 0)
