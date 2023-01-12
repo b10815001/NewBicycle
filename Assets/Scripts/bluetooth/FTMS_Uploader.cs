@@ -14,7 +14,8 @@ public class FTMS_Uploader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        BicycleDataSender.initial();
+        if (uploadSwitch)
+            BicycleDataSender.initial();
     }
 
     // Update is called once per frame

@@ -45,7 +45,6 @@ public class IndoorBike_FTMS_Sender: MonoBehaviour
                     Debug.Log("nan");
                     rest = 0.0f;
                 }
-                Debug.Log("resistance: " + rest);
                 indoorBike_FTMS_connector.SetResistance(rest);
             }
             else 

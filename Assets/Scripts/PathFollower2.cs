@@ -15,6 +15,7 @@ public class PathFollower2 : MonoBehaviour
     public List<int> end = new();
     public List<bool> straight = new();
     public float view_size = 100;
+    public float view_buffer = 100;
     public GameObject view = null;
 
     private int current_road = 0;
@@ -124,24 +125,21 @@ public class PathFollower2 : MonoBehaviour
     {
         for (int id = 0; id < road_list.Count; id++)
         {
-            Vector3 compare = road_list[id].spline.GetSplineValue(road_list[id].spline.GetClosestParam(transform.position, false, false));
-            
-            if ((transform.position - compare).magnitude < view_size)
-            {
-                road_list[id].gameObject.SetActive(true);
-            }
-            else road_list[id].gameObject.SetActive(false);
+            bool state = inRange(road_list[id].spline.GetSplineValue(road_list[id].spline.GetClosestParam(transform.position, false, false)));
+            road_list[id].gameObject.SetActive(state);
         }
         for (int id = 0; id < intersection_list.Count; id++)
         {
-            Vector3 compare = intersection_list[id].gameObject.transform.position;
-
-            if ((transform.position - compare).magnitude < view_size)
-            {
-                intersection_list[id].gameObject.SetActive(true);
-            }
-            else intersection_list[id].gameObject.SetActive(false);
+            bool state = inRange(intersection_list[id].gameObject.transform.position);
+            intersection_list[id].gameObject.SetActive(state);
         }
+    }
+
+    bool inRange(Vector3 compare)
+    {
+        if ((transform.position - compare).magnitude < view_size) return true;
+        else if ((transform.position - compare).magnitude > view_size + view_buffer) return false;
+        return true;
     }
 
     private void arclength(float distance, float speed = 0)
@@ -377,7 +375,7 @@ public class PathFollower2 : MonoBehaviour
     void initPathMap()
     {
         var coord = toPathMapCoord(current_pos);
-        path_map.DrawCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 5, Color.grey);
+        path_map.DrawFilledCircle(new Vector2Int(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.z)), 5, Color.grey);
     }
 
     public void drawCurrentPosMap()
