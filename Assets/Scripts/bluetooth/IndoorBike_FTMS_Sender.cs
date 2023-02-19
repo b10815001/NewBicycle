@@ -8,7 +8,7 @@ public class IndoorBike_FTMS_Sender: MonoBehaviour
     [SerializeField]
     IndoorBike_FTMS_Connector indoorBike_FTMS_connector;
     [SerializeField]
-    PathFollower2 path_follower;
+    PathFollower path_follower;
     [SerializeField]
     float resistant_factor = 7000f;
     float send_resistance_duration = 0.0f;

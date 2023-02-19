@@ -18,7 +18,7 @@ public class UIUpdate : MonoBehaviour
     [SerializeField]
     Text slope_text;
     [SerializeField]
-    PathFollower2 path_follower;
+    PathFollower path_follower;
     [SerializeField]
     RawImage bluetooth_image;
     [SerializeField]
